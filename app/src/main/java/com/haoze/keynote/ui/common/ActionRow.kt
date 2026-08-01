@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.SpacingTokens
@@ -28,7 +29,9 @@ fun ActionRow(
     isDestructive: Boolean = false,
     isLoading: Boolean = false,
     loadingLabel: String = "",
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    rowHeight: Dp = SpacingTokens.actionRowHeight,
+    horizontalPadding: Dp = SpacingTokens.tinySpacing
 ) {
     val colors = LocalAppColors.current
     val tint = when {
@@ -40,9 +43,9 @@ fun ActionRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(SpacingTokens.actionRowHeight)
+            .height(rowHeight)
             .clickable(enabled = enabled && !isLoading) { onClick() }
-            .padding(horizontal = SpacingTokens.tinySpacing),
+            .padding(horizontal = horizontalPadding),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isLoading) {
