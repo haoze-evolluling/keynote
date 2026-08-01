@@ -1,15 +1,12 @@
 package com.haoze.keynote.ui.home
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.haoze.keynote.ui.common.ActionRow
-import com.haoze.keynote.ui.theme.LocalAppColors
+import com.haoze.keynote.ui.common.ActionMenuDialog
 import com.haoze.keynote.ui.theme.ModalTokens
 import androidx.compose.ui.res.painterResource
 import com.haoze.keynote.R
@@ -33,24 +30,7 @@ fun NoteActionBottomSheet(
     onDelete: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    val colors = LocalAppColors.current
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "笔记操作",
-                style = MaterialTheme.typography.titleLarge
-            )
-        },
-        text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = screenHeight * 0.58f)
-                    .verticalScroll(rememberScrollState())
-            ) {
+    ActionMenuDialog(title = "笔记操作", onDismiss = onDismiss) {
                 ActionRow(painterResource(R.drawable.ic_edit), "编辑笔记", onEdit, rowHeight = 48.dp, horizontalPadding = 16.dp)
                 ActionRow(painterResource(R.drawable.ic_info), "查看详情", onViewDetails, rowHeight = 48.dp, horizontalPadding = 16.dp)
 
@@ -73,16 +53,5 @@ fun NoteActionBottomSheet(
                 HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
 
                 ActionRow(painterResource(R.drawable.ic_delete), "删除笔记", onDelete, isDestructive = true, rowHeight = 48.dp, horizontalPadding = 16.dp)
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("关闭")
-            }
-        },
-        containerColor = colors.surface,
-        titleContentColor = colors.onSurface,
-        textContentColor = colors.onSurface,
-        shape = MaterialTheme.shapes.extraLarge
-    )
+    }
 }

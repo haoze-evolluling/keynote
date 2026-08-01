@@ -36,6 +36,8 @@ import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.LocalDarkModeManager
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.common.ActionMenuDialog
+import com.haoze.keynote.ui.common.ActionRow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -71,6 +73,8 @@ fun AIChatScreen(
     var showNewConversationConfirm by remember { mutableStateOf(false) }
     var showDeleteConversationConfirm by remember { mutableStateOf(false) }
     var showHistoryDialog by remember { mutableStateOf(false) }
+    var assistantMenuExpanded by remember { mutableStateOf(false) }
+    var actionsMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
@@ -124,13 +128,12 @@ fun AIChatScreen(
     Scaffold(
         containerColor = colors.transparent,
         topBar = {
-            var assistantMenuExpanded by remember { mutableStateOf(false) }
             TopAppBar(
                 title = {
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("AI 对话")
-                            Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                            Box {
                                 val arrowRotation by animateFloatAsState(
                                     targetValue = if (assistantMenuExpanded) 180f else 0f,
                                     animationSpec = tween(200),
@@ -142,42 +145,6 @@ fun AIChatScreen(
                                         contentDescription = "切换助手",
                                         modifier = Modifier.graphicsLayer { rotationZ = arrowRotation }
                                     )
-                                }
-                                DropdownMenu(
-                                    expanded = assistantMenuExpanded,
-                                    onDismissRequest = { assistantMenuExpanded = false },
-                                    modifier = Modifier.widthIn(min = 1.dp)
-                                ) {
-                                    val allAssistants = listOf(
-                                        AssistantType.CHAT,
-                                        AssistantType.BILL,
-                                        AssistantType.PLANNER
-                                    )
-                                    allAssistants.forEach { type ->
-                                        val label = assistantUiText(type).menuLabel
-                                        val isSelected = type == currentAssistant
-                                        DropdownMenuItem(
-                                            text = {
-                                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                                    if (isSelected) {
-                                                        Icon(
-                                                            painterResource(R.drawable.ic_check),
-                                                            contentDescription = null,
-                                                            modifier = Modifier.size(18.dp)
-                                                        )
-                                                        Spacer(Modifier.width(8.dp))
-                                                    } else {
-                                                        Spacer(Modifier.width(26.dp))
-                                                    }
-                                                    Text(label)
-                                                }
-                                            },
-                                            onClick = {
-                                                viewModel.switchAssistant(type)
-                                                assistantMenuExpanded = false
-                                            }
-                                        )
-                                    }
                                 }
                             }
                         }
@@ -197,69 +164,57 @@ fun AIChatScreen(
                     }
                 },
                 actions = {
-                    var actionsMenuExpanded by remember { mutableStateOf(false) }
-                    Box {
-                        IconButton(onClick = { actionsMenuExpanded = true }) {
-                            Icon(painterResource(R.drawable.ic_more_vert), contentDescription = "更多操作")
-                        }
-                        DropdownMenu(
-                            expanded = actionsMenuExpanded,
-                            onDismissRequest = { actionsMenuExpanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("历史对话") },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_history_outlined), contentDescription = null) },
-                                onClick = {
-                                    actionsMenuExpanded = false
-                                    showHistoryDialog = true
-                                }
-                            )
-                            if (messages.isNotEmpty()) {
-                                DropdownMenuItem(
-                                    text = { Text("保存对话") },
-                                    leadingIcon = { Icon(painterResource(R.drawable.ic_edit_outlined), contentDescription = null) },
-                                    enabled = !isCreatingNote,
-                                    onClick = {
-                                        actionsMenuExpanded = false
-                                        isCreatingNote = true
-                                        viewModel.createNoteFromMessages()
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("删除对话") },
-                                    leadingIcon = { Icon(painterResource(R.drawable.ic_delete_outlined), contentDescription = null) },
-                                    onClick = {
-                                        actionsMenuExpanded = false
-                                        showDeleteConversationConfirm = true
-                                    }
-                                )
-                            }
-                            DropdownMenuItem(
-                                text = { Text("重新生成") },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_refresh_outlined), contentDescription = null) },
-                                enabled = !isLoading && messages.any { it.role == "user" },
-                                onClick = {
-                                    actionsMenuExpanded = false
-                                    viewModel.regenerateLastResponse()
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("新对话") },
-                                leadingIcon = { Icon(painterResource(R.drawable.ic_chat_outlined_mirrored), contentDescription = null) },
-                                onClick = {
-                                    actionsMenuExpanded = false
-                                    if (messages.isEmpty()) {
-                                        viewModel.clearMessages()
-                                    } else {
-                                        showNewConversationConfirm = true
-                                    }
-                                }
-                            )
-                        }
+                    IconButton(onClick = { actionsMenuExpanded = true }) {
+                        Icon(painterResource(R.drawable.ic_more_vert), contentDescription = "更多操作")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
             )
+
+            if (assistantMenuExpanded) {
+                ActionMenuDialog(title = "切换助手", onDismiss = { assistantMenuExpanded = false }) {
+                    listOf(AssistantType.CHAT, AssistantType.BILL, AssistantType.PLANNER).forEach { type ->
+                        ActionRow(
+                            icon = painterResource(if (type == currentAssistant) R.drawable.ic_check else R.drawable.ic_auto_awesome),
+                            label = assistantUiText(type).menuLabel,
+                            onClick = {
+                                viewModel.switchAssistant(type)
+                                assistantMenuExpanded = false
+                            },
+                            rowHeight = 48.dp,
+                            horizontalPadding = 16.dp
+                        )
+                    }
+                }
+            }
+
+            if (actionsMenuExpanded) {
+                ActionMenuDialog(title = "更多操作", onDismiss = { actionsMenuExpanded = false }) {
+                    ActionRow(painterResource(R.drawable.ic_history_outlined), "历史对话", {
+                        actionsMenuExpanded = false
+                        showHistoryDialog = true
+                    }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                    if (messages.isNotEmpty()) {
+                        ActionRow(painterResource(R.drawable.ic_edit_outlined), "保存对话", {
+                            actionsMenuExpanded = false
+                            isCreatingNote = true
+                            viewModel.createNoteFromMessages()
+                        }, enabled = !isCreatingNote, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                        ActionRow(painterResource(R.drawable.ic_delete_outlined), "删除对话", {
+                            actionsMenuExpanded = false
+                            showDeleteConversationConfirm = true
+                        }, isDestructive = true, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                    }
+                    ActionRow(painterResource(R.drawable.ic_refresh_outlined), "重新生成", {
+                        actionsMenuExpanded = false
+                        viewModel.regenerateLastResponse()
+                    }, enabled = !isLoading && messages.any { it.role == "user" }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                    ActionRow(painterResource(R.drawable.ic_chat_outlined_mirrored), "新对话", {
+                        actionsMenuExpanded = false
+                        if (messages.isEmpty()) viewModel.clearMessages() else showNewConversationConfirm = true
+                    }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                }
+            }
         }
     ) { innerPadding ->
         Box(

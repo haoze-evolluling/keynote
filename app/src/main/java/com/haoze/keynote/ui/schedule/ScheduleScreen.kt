@@ -33,6 +33,7 @@ import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.common.ActionMenuDialog
 import androidx.compose.ui.res.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.R
@@ -176,46 +177,37 @@ fun ScheduleScreen(
         val currentSchedule = schedules.find { it.id == showActionDialogForSchedule }
         if (currentSchedule != null) {
             val hasLink = currentSchedule.noteId != null
-            AlertDialog(
-                onDismissRequest = { showActionDialogForSchedule = null },
-                title = { Text(currentSchedule.title) },
-                containerColor = colors.surface,
-                textContentColor = colors.onSurface,
-                shape = RoundedCornerShape(16.dp),
-                text = {
-                    DialogContent {
+            ActionMenuDialog(
+                title = currentSchedule.title,
+                onDismiss = { showActionDialogForSchedule = null }
+            ) {
                         ActionRow(icon = painterResource(R.drawable.ic_edit), label = "编辑日程", onClick = {
                             showEditDialogForSchedule = currentSchedule
                             showActionDialogForSchedule = null
-                        })
+                        }, rowHeight = 48.dp, horizontalPadding = 16.dp)
                         if (hasLink) {
                             ActionRow(icon = painterResource(R.drawable.ic_link_off), label = "取消关联笔记", onClick = {
                                 viewModel.unlinkNote(currentSchedule.id)
                                 showActionDialogForSchedule = null
-                            })
+                            }, rowHeight = 48.dp, horizontalPadding = 16.dp)
                         } else {
                             ActionRow(icon = painterResource(R.drawable.ic_link), label = "关联笔记", onClick = {
                                 showLinkNoteDialog = currentSchedule.id
                                 showActionDialogForSchedule = null
-                            })
+                            }, rowHeight = 48.dp, horizontalPadding = 16.dp)
                         }
                         HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
                         ActionRow(icon = painterResource(R.drawable.ic_auto_awesome), label = if (isGeneratingNote) "生成中..." else "AI 生成笔记", onClick = {
                             pendingAiScheduleId = currentSchedule.id
                             viewModel.aiGenerateNote(currentSchedule.id)
                             showActionDialogForSchedule = null
-                        })
+                        }, rowHeight = 48.dp, horizontalPadding = 16.dp)
                         HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
                         ActionRow(icon = painterResource(R.drawable.ic_delete), label = "删除日程", isDestructive = true, onClick = {
                             showDeleteConfirm = currentSchedule
                             showActionDialogForSchedule = null
-                        })
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showActionDialogForSchedule = null }) { Text("取消") }
-                }
-            )
+                        }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+            }
         }
     }
 

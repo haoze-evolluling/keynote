@@ -65,7 +65,7 @@ fun ActionRow(
         Spacer(modifier = Modifier.width(SpacingTokens.contentSpacing))
         Text(
             text = if (isLoading) loadingLabel else label,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             color = tint
         )
     }

@@ -28,6 +28,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.TodoCategoryEntity
 import com.haoze.keynote.data.db.entity.TodoEntity
 import com.haoze.keynote.ui.common.ActionRow
+import com.haoze.keynote.ui.common.ActionMenuDialog
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
@@ -297,7 +298,6 @@ private fun TodoCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TodoActionBottomSheet(
     todo: TodoEntity,
@@ -306,22 +306,17 @@ private fun TodoActionBottomSheet(
     onDelete: () -> Unit,
     onToggleComplete: () -> Unit
 ) {
-    val colors = LocalAppColors.current
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = colors.surface
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            ActionRow(painterResource(R.drawable.ic_edit), "编辑", onEdit)
+    ActionMenuDialog(title = "待办操作", onDismiss = onDismiss) {
+            ActionRow(painterResource(R.drawable.ic_edit), "编辑", onEdit, rowHeight = 48.dp, horizontalPadding = 16.dp)
             ActionRow(
                 painterResource(R.drawable.ic_done),
                 if (todo.isCompleted) "标记未完成" else "标记完成",
-                onToggleComplete
+                onToggleComplete,
+                rowHeight = 48.dp,
+                horizontalPadding = 16.dp
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
-            ActionRow(painterResource(R.drawable.ic_delete), "删除", onDelete, isDestructive = true)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
+            ActionRow(painterResource(R.drawable.ic_delete), "删除", onDelete, isDestructive = true, rowHeight = 48.dp, horizontalPadding = 16.dp)
     }
 }
 

@@ -27,6 +27,7 @@ import com.haoze.keynote.ui.common.ActionRow
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.common.ActionMenuDialog
 import android.content.Intent
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -271,38 +272,31 @@ private fun EditNoteMoreDialog(
     onPolish: () -> Unit,
     onDelete: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = colors.surface,
-        shape = RoundedCornerShape(16.dp),
-        title = {
-            Text(
-                "更多操作",
-                style = ModalTokens.titleTextStyle,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-        },
-        text = {
-            DialogContent(modifier = Modifier.fillMaxWidth()) {
+    ActionMenuDialog(title = "更多操作", onDismiss = onDismiss) {
                 // 编辑操作组
                 ActionRow(
                     icon = painterResource(R.drawable.ic_save),
                     label = "保存",
-                    onClick = { onSave(); onDismiss() }
+                    onClick = { onSave(); onDismiss() },
+                    rowHeight = 48.dp,
+                    horizontalPadding = 16.dp
                 )
                 ActionRow(
                     icon = painterResource(R.drawable.ic_undo),
                     label = "撤回",
                     onClick = { onUndo(); onDismiss() },
-                    enabled = canUndo
+                    enabled = canUndo,
+                    rowHeight = 48.dp,
+                    horizontalPadding = 16.dp
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
                 // 分享操作组
                 ActionRow(
                     icon = painterResource(R.drawable.ic_share),
                     label = "分享",
-                    onClick = { onShare(); onDismiss() }
+                    onClick = { onShare(); onDismiss() },
+                    rowHeight = 48.dp,
+                    horizontalPadding = 16.dp
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
                 // AI功能组
@@ -312,7 +306,9 @@ private fun EditNoteMoreDialog(
                     onClick = { onSummarize(); onDismiss() },
                     enabled = !isSummarizing && !isPreview,
                     isLoading = isSummarizing,
-                    loadingLabel = "摘要生成中..."
+                    loadingLabel = "摘要生成中...",
+                    rowHeight = 48.dp,
+                    horizontalPadding = 16.dp
                 )
                 ActionRow(
                     icon = painterResource(R.drawable.ic_label),
@@ -320,7 +316,9 @@ private fun EditNoteMoreDialog(
                     onClick = { onGenerateTags(); onDismiss() },
                     enabled = !isGenerating && !isPreview,
                     isLoading = isGenerating,
-                    loadingLabel = "标签生成中..."
+                    loadingLabel = "标签生成中...",
+                    rowHeight = 48.dp,
+                    horizontalPadding = 16.dp
                 )
                 ActionRow(
                     icon = painterResource(R.drawable.ic_auto_awesome),
@@ -328,7 +326,9 @@ private fun EditNoteMoreDialog(
                     onClick = { onPolish(); onDismiss() },
                     enabled = !isPolishing && !isPreview,
                     isLoading = isPolishing,
-                    loadingLabel = "润色中..."
+                    loadingLabel = "润色中...",
+                    rowHeight = 48.dp,
+                    horizontalPadding = 16.dp
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
                 // 危险操作组
@@ -336,17 +336,11 @@ private fun EditNoteMoreDialog(
                     icon = painterResource(R.drawable.ic_delete),
                     label = "删除",
                     onClick = { onDelete(); onDismiss() },
-                    isDestructive = true
+                    isDestructive = true,
+                    rowHeight = 48.dp,
+                    horizontalPadding = 16.dp
                 )
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("取消")
-            }
-        }
-    )
+    }
 }
 
 @Composable
