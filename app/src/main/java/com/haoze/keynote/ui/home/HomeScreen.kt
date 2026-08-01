@@ -51,6 +51,8 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         topBar = {
             TopAppBar(
                 title = { Text("KeyNote") },
@@ -62,7 +64,7 @@ fun HomeScreen(
             )
         },
         floatingActionButton = {
-            Box(modifier = Modifier.padding(bottom = 64.dp)) {
+            Box(modifier = Modifier.padding(bottom = 16.dp)) {
                 FloatingActionButton(
                     onClick = {
                         scope.launch {
@@ -70,6 +72,8 @@ fun HomeScreen(
                             onNavigateToEdit(noteId)
                         }
                     },
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
                 ) {
                     Icon(painterResource(R.drawable.ic_add), contentDescription = "新建笔记")

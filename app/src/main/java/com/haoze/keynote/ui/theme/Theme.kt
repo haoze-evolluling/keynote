@@ -10,6 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -22,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import android.os.Build
 
 // ─── Dark Mode ────────────────────────────────────────────────────────────────
 
@@ -95,61 +102,35 @@ data class AppColors(
 
 val LocalAppColors = staticCompositionLocalOf<AppColors> { error("No AppColors provided") }
 
-object AppColorPalette {
-    val Light = AppColors(
-        primary = Color(0xFF0593FF), onPrimary = Color.White, primaryContainer = Color(0xFFD1E4FF), onPrimaryContainer = Color(0xFF001D36),
-        secondary = Color(0xFF535F70), onSecondary = Color.White, secondaryContainer = Color(0xFFD7E3F7), onSecondaryContainer = Color(0xFF101C2B),
-        surface = Color(0xFFFDFCFF), onSurface = Color(0xFF1A1C1E), surfaceVariant = Color(0xFFDAE4EF), onSurfaceVariant = Color(0xFF49454F),
-        error = Color(0xFFBA1A1A), onError = Color.White, errorContainer = Color(0xFFFFDAD6), onErrorContainer = Color(0xFF410002),
-        tertiary = Color(0xFF7C5800), onTertiary = Color.White, tertiaryContainer = Color(0xFFFFDEA1), onTertiaryContainer = Color(0xFF261A00),
-        outline = Color(0xFF79747E), outlineVariant = Color(0xFFCAC4D0), background = Color(0xFFFDFCFF), onBackground = Color(0xFF1A1C1E),
-        transparent = Color.Transparent, shadow = Color.Black.copy(alpha = 0.1f), dialogContainer = Color(0xFFFDFCFF), unspecified = Color.Unspecified,
-        chartColors = listOf(Color(0xFF0593FF), Color(0xFF5BC0FF), Color(0xFF0066CC), Color(0xFFD1E4FF), Color(0xFF49454F)),
-        priorityLow = Color(0xFF4CAF50), priorityMedium = Color(0xFFFF9800), priorityHigh = Color(0xFFF44336),
-        statTotalSpending = Color(0xFFFF5252), statBillCount = Color(0xFFFFAB40), statDailyAvg = Color(0xFF69F0AE), statTopCategory = Color(0xFF40C4FF)
-    )
+private val FallbackLightScheme = lightColorScheme(
+    primary = Color(0xFF1769AA), onPrimary = Color.White, primaryContainer = Color(0xFFD2E4FF), onPrimaryContainer = Color(0xFF001D36),
+    secondary = Color(0xFF535F70), onSecondary = Color.White, secondaryContainer = Color(0xFFD7E3F7), onSecondaryContainer = Color(0xFF101C2B),
+    tertiary = Color(0xFF6C5B00), onTertiary = Color.White, tertiaryContainer = Color(0xFFFFE978), onTertiaryContainer = Color(0xFF211B00),
+    background = Color(0xFFF9F9FC), onBackground = Color(0xFF1A1C1E), surface = Color(0xFFF9F9FC), onSurface = Color(0xFF1A1C1E),
+    surfaceVariant = Color(0xFFDEE3EB), onSurfaceVariant = Color(0xFF42474E), outline = Color(0xFF72777F), outlineVariant = Color(0xFFC2C7CF),
+    surfaceContainerLowest = Color(0xFFFFFFFF), surfaceContainerLow = Color(0xFFF3F4F7), surfaceContainer = Color(0xFFEEEFF3), surfaceContainerHigh = Color(0xFFE8EAF0), surfaceContainerHighest = Color(0xFFE2E5EA)
+)
 
-    val Dark = AppColors(
-        primary = Color(0xFF75C7FF), onPrimary = Color(0xFF00344F), primaryContainer = Color(0xFF004B72), onPrimaryContainer = Color(0xFFD1E4FF),
-        secondary = Color(0xFFBBC7DB), onSecondary = Color(0xFF253141), secondaryContainer = Color(0xFF3B4758), onSecondaryContainer = Color(0xFFD7E3F7),
-        surface = Color(0xFF101418), onSurface = Color(0xFFE2E2E8), surfaceVariant = Color(0xFF202A33), onSurfaceVariant = Color(0xFFC2C7CF),
-        error = Color(0xFFFFB4AB), onError = Color(0xFF690005), errorContainer = Color(0xFF93000A), onErrorContainer = Color(0xFFFFDAD6),
-        tertiary = Color(0xFFE9C16D), onTertiary = Color(0xFF3F2E00), tertiaryContainer = Color(0xFF5B4300), onTertiaryContainer = Color(0xFFFFDEA1),
-        outline = Color(0xFF8E949D), outlineVariant = Color(0xFF4E5A67), background = Color(0xFF0D1117), onBackground = Color(0xFFE2E2E8),
-        transparent = Color.Transparent, shadow = Color.Black.copy(alpha = 0.45f), dialogContainer = Color(0xFF182028), unspecified = Color.Unspecified,
-        chartColors = listOf(Color(0xFF75C7FF), Color(0xFF89D5FF), Color(0xFF4EA3E5), Color(0xFFB7DCFF), Color(0xFFC2C7CF)),
-        priorityLow = Color(0xFF81C995), priorityMedium = Color(0xFFFFB74D), priorityHigh = Color(0xFFFF8A80),
-        statTotalSpending = Color(0xFFFF8A80), statBillCount = Color(0xFFFFB74D), statDailyAvg = Color(0xFF81C995), statTopCategory = Color(0xFF75C7FF)
-    )
-}
+private val FallbackDarkScheme = darkColorScheme(
+    primary = Color(0xFFA6CDFF), onPrimary = Color(0xFF003258), primaryContainer = Color(0xFF004A79), onPrimaryContainer = Color(0xFFD2E4FF),
+    secondary = Color(0xFFBBC7DB), onSecondary = Color(0xFF253141), secondaryContainer = Color(0xFF3B4758), onSecondaryContainer = Color(0xFFD7E3F7),
+    tertiary = Color(0xFFE8D971), onTertiary = Color(0xFF363000), tertiaryContainer = Color(0xFF504900), onTertiaryContainer = Color(0xFFFFE978),
+    background = Color(0xFF1A1B1F), onBackground = Color(0xFFE3E2E6), surface = Color(0xFF1A1B1F), onSurface = Color(0xFFE3E2E6),
+    surfaceVariant = Color(0xFF41474F), onSurfaceVariant = Color(0xFFC2C7CF), outline = Color(0xFF8C9199), outlineVariant = Color(0xFF41474F),
+    surfaceContainerLowest = Color(0xFF121316), surfaceContainerLow = Color(0xFF1E1F23), surfaceContainer = Color(0xFF222328), surfaceContainerHigh = Color(0xFF2C2D32), surfaceContainerHighest = Color(0xFF37383E)
+)
 
-fun AppColors.toMaterialColorScheme() = if (this == AppColorPalette.Light) {
-    androidx.compose.material3.lightColorScheme(
-        primary = primary, onPrimary = onPrimary, primaryContainer = primaryContainer, onPrimaryContainer = onPrimaryContainer,
-        secondary = secondary, onSecondary = onSecondary, secondaryContainer = secondaryContainer, onSecondaryContainer = onSecondaryContainer,
-        tertiary = tertiary, onTertiary = onTertiary, tertiaryContainer = tertiaryContainer, onTertiaryContainer = onTertiaryContainer,
-        error = error, onError = onError, errorContainer = errorContainer, onErrorContainer = onErrorContainer,
-        background = background, onBackground = onBackground, surface = surface, onSurface = onSurface,
-        surfaceVariant = surfaceVariant, onSurfaceVariant = onSurfaceVariant, outline = outline, outlineVariant = outlineVariant,
-        inverseSurface = onSurface, inverseOnSurface = surface, inversePrimary = primaryContainer,
-        surfaceDim = Color(0xFFE0E6EE), surfaceBright = surface, surfaceContainerLowest = surface,
-        surfaceContainerLow = Color(0xFFF7F9FC), surfaceContainer = Color(0xFFF1F5F9),
-        surfaceContainerHigh = Color(0xFFEAF0F7), surfaceContainerHighest = Color(0xFFE3EAF2), scrim = Color.Black
-    )
-} else {
-    androidx.compose.material3.darkColorScheme(
-        primary = primary, onPrimary = onPrimary, primaryContainer = primaryContainer, onPrimaryContainer = onPrimaryContainer,
-        secondary = secondary, onSecondary = onSecondary, secondaryContainer = secondaryContainer, onSecondaryContainer = onSecondaryContainer,
-        tertiary = tertiary, onTertiary = onTertiary, tertiaryContainer = tertiaryContainer, onTertiaryContainer = onTertiaryContainer,
-        error = error, onError = onError, errorContainer = errorContainer, onErrorContainer = onErrorContainer,
-        background = background, onBackground = onBackground, surface = surface, onSurface = onSurface,
-        surfaceVariant = surfaceVariant, onSurfaceVariant = onSurfaceVariant, outline = outline, outlineVariant = outlineVariant,
-        inverseSurface = onSurface, inverseOnSurface = surface, inversePrimary = primaryContainer,
-        surfaceDim = Color(0xFF0B0F12), surfaceBright = Color(0xFF303841), surfaceContainerLowest = Color(0xFF0B0F12),
-        surfaceContainerLow = Color(0xFF151B21), surfaceContainer = Color(0xFF192129), surfaceContainerHigh = Color(0xFF202A33),
-        surfaceContainerHighest = Color(0xFF2A343E), scrim = Color.Black
-    )
-}
+fun ColorScheme.toAppColors(darkTheme: Boolean) = AppColors(
+    primary, onPrimary, primaryContainer, onPrimaryContainer, secondary, onSecondary, secondaryContainer, onSecondaryContainer,
+    surface, onSurface, surfaceVariant, onSurfaceVariant, error, onError, errorContainer, onErrorContainer, tertiary, onTertiary,
+    tertiaryContainer, onTertiaryContainer, outline, outlineVariant, background, onBackground, Color.Transparent,
+    Color.Black.copy(alpha = if (darkTheme) 0.45f else 0.12f), surfaceContainerHigh, Color.Unspecified,
+    chartColors = listOf(primary, tertiary, secondary, primaryContainer, onSurfaceVariant),
+    priorityLow = if (darkTheme) Color(0xFF81C995) else Color(0xFF2E7D32),
+    priorityMedium = if (darkTheme) Color(0xFFFFB74D) else Color(0xFFB06000),
+    priorityHigh = if (darkTheme) Color(0xFFFF8A80) else Color(0xFFBA1A1A),
+    statTotalSpending = error, statBillCount = tertiary, statDailyAvg = if (darkTheme) Color(0xFF81C995) else Color(0xFF2E7D32), statTopCategory = primary
+)
 
 // ─── Spacing ──────────────────────────────────────────────────────────────────
 
@@ -213,10 +194,10 @@ fun DialogContent(
 
 private val AppShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
-    small = RoundedCornerShape(10.dp),
-    medium = RoundedCornerShape(12.dp),
-    large = RoundedCornerShape(16.dp),
-    extraLarge = RoundedCornerShape(24.dp)
+    small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(10.dp),
+    large = RoundedCornerShape(14.dp),
+    extraLarge = RoundedCornerShape(20.dp)
 )
 
 // ─── Theme Composable ─────────────────────────────────────────────────────────
@@ -227,14 +208,21 @@ fun KeyNoteTheme(
     content: @Composable () -> Unit
 ) {
     val darkTheme = darkModeManager.isDarkMode()
-    val colors = if (darkTheme) AppColorPalette.Dark else AppColorPalette.Light
+    val context = LocalContext.current
+    val colorScheme = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && darkTheme -> dynamicDarkColorScheme(context)
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
+        darkTheme -> FallbackDarkScheme
+        else -> FallbackLightScheme
+    }
+    val colors = colorScheme.toAppColors(darkTheme)
 
     CompositionLocalProvider(
         LocalAppColors provides colors,
         LocalDarkModeManager provides darkModeManager
     ) {
         MaterialTheme(
-            colorScheme = colors.toMaterialColorScheme(),
+            colorScheme = colorScheme,
             typography = Typography,
             shapes = AppShapes,
             content = content

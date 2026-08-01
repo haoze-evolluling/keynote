@@ -125,7 +125,7 @@ fun TrashScreen(
             dismissButton = {
                 TextButton(onClick = { pendingPermanentDelete = null }) { Text("取消") }
             },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
         )

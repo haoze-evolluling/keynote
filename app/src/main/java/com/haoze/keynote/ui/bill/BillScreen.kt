@@ -137,7 +137,7 @@ fun BillScreen(
                 }
             },
             dismissButton = { TextButton(onClick = { showDeleteConfirm = null }) { Text("取消") } },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
         )
@@ -165,7 +165,7 @@ fun BillScreen(
                     }
                 },
                 confirmButton = { TextButton(onClick = { showBillDetailsForBill = null }) { Text("关闭") } },
-                containerColor = colors.surface,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 textContentColor = colors.onSurface,
                 shape = RoundedCornerShape(16.dp),
             )
@@ -271,7 +271,7 @@ private fun BillFormDialog(
             ) { Text(if (title == "新建账单") "创建" else "保存") }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
-        containerColor = colors.surface,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
         shape = RoundedCornerShape(16.dp),
     )
@@ -313,7 +313,7 @@ private fun BillFormDialog(
                 }) { Text("确定") }
             },
             dismissButton = { TextButton(onClick = { showTimePicker = false }) { Text("取消") } },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
         )
@@ -361,7 +361,7 @@ private fun BillCard(
         modifier = Modifier.fillMaxWidth()
             .combinedClickable(onClick = {}, onLongClick = onLongClick),
         border = BorderStroke(1.dp, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = colors.surface)
+        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {

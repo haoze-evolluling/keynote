@@ -57,7 +57,7 @@ fun NoteDeleteConfirmDialog(
             dismissButton = {
                 TextButton(onClick = onDismiss) { Text("取消") }
             },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
         )
@@ -101,7 +101,7 @@ fun NoteDetailsDialog(
             confirmButton = {
                 TextButton(onClick = onDismiss) { Text("关闭") }
             },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
         )
@@ -141,8 +141,8 @@ fun NoteAddTagDialog(
             dismissButton = {
                 TextButton(onClick = onDismiss) { Text("取消") }
             },
-            containerColor = LocalAppColors.current.surface,
-            textContentColor = LocalAppColors.current.onSurface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            textContentColor = MaterialTheme.colorScheme.onSurface,
             shape = RoundedCornerShape(16.dp),
         )
     }
@@ -187,7 +187,7 @@ fun NoteManageTagsDialog(
             confirmButton = {
                 TextButton(onClick = onDismiss) { Text("关闭") }
             },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
         )

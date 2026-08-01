@@ -168,7 +168,7 @@ fun EditNoteScreen(
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) { Text("取消") }
             },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
         )
@@ -526,7 +526,7 @@ private fun SummaryCard(
             text = { OutlinedTextField(value = editedText, onValueChange = { editedText = it }, modifier = Modifier.fillMaxWidth(), maxLines = 5) },
             confirmButton = { TextButton(onClick = { onUpdate(editedText); showEditDialog = false }) { Text("保存") } },
             dismissButton = { TextButton(onClick = { showEditDialog = false }) { Text("取消") } },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
         )
@@ -552,7 +552,7 @@ private fun PolishedTextDialog(
         },
         confirmButton = { TextButton(onClick = onApply) { Text("替换") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
-        containerColor = colors.surface,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
         shape = RoundedCornerShape(16.dp),
     )

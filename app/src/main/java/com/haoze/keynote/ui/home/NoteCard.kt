@@ -38,7 +38,7 @@ fun NoteCard(
                 onLongClick = onLongClick
             ),
         border = BorderStroke(SpacingTokens.borderWidth, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = colors.surface),
+        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         elevation = CardDefaults.cardElevation(defaultElevation = SpacingTokens.cardElevation)
     ) {
         Column(modifier = Modifier.padding(SpacingTokens.screenPadding)) {

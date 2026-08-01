@@ -40,7 +40,7 @@ fun ActionMenuDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) { Text("关闭") }
         },
-        containerColor = colors.surface,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         titleContentColor = colors.onSurface,
         textContentColor = colors.onSurface,
         shape = MaterialTheme.shapes.extraLarge

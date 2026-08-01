@@ -105,7 +105,7 @@ fun AaSplitScreen(
         AlertDialog(
             onDismissRequest = { showDetailDialog = null },
             title = { Text(aaSplit.title) },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = {
@@ -140,7 +140,7 @@ fun AaSplitScreen(
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = null },
             title = { Text("删除记录") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = { Text("确定要删除这条AA计算记录吗？") },
@@ -169,7 +169,7 @@ private fun AaSplitCard(
             .border(1.dp, colors.outlineVariant, MaterialTheme.shapes.medium)
             .combinedClickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = colors.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -236,7 +236,7 @@ private fun AaSplitCreateDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("新建AA计算") },
-        containerColor = colors.surface,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
         shape = RoundedCornerShape(16.dp),
         text = {

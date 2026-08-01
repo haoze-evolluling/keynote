@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.haoze.keynote.ui.navigation.AppNavigation
-import com.haoze.keynote.ui.theme.AppColorPalette
 import com.haoze.keynote.ui.theme.DarkModeManager
 import com.haoze.keynote.ui.theme.DarkModePreference
 import com.haoze.keynote.ui.theme.KeyNoteTheme
@@ -47,33 +46,20 @@ class MainActivity : ComponentActivity() {
                 }
                 ?: systemInDarkTheme
 
-            val colors = if (isDarkMode) AppColorPalette.Dark else AppColorPalette.Light
-
-            SideEffect {
-                window.setBackgroundDrawable(ColorDrawable(colors.background.toArgb()))
-                val controller = WindowInsetsControllerCompat(window, window.decorView)
-                controller.isAppearanceLightStatusBars = !isDarkMode
-                controller.isAppearanceLightNavigationBars = !isDarkMode
-            }
-
-            if (darkModePrefValue == null) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = colors.background
-                ) {}
-                return@setContent
-            }
-
-            val darkModeManager = remember(darkModePrefValue) {
-                DarkModeManager(preference = darkModePrefValue!!.toDarkModePreference())
+            val darkModeManager = remember(darkModePrefValue, isDarkMode) {
+                DarkModeManager(preference = darkModePrefValue?.toDarkModePreference() ?: if (isDarkMode) DarkModePreference.DARK else DarkModePreference.LIGHT)
             }
 
             KeyNoteTheme(darkModeManager = darkModeManager) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = if (darkModeManager.isDarkMode()) AppColorPalette.Dark.background else AppColorPalette.Light.background
-                ) {
-                    AppNavigation()
+                val colors = androidx.compose.material3.MaterialTheme.colorScheme
+                SideEffect {
+                    window.setBackgroundDrawable(ColorDrawable(colors.background.toArgb()))
+                    val controller = WindowInsetsControllerCompat(window, window.decorView)
+                    controller.isAppearanceLightStatusBars = !isDarkMode
+                    controller.isAppearanceLightNavigationBars = !isDarkMode
+                }
+                Surface(modifier = Modifier.fillMaxSize(), color = colors.background) {
+                    if (darkModePrefValue != null) AppNavigation()
                 }
             }
         }

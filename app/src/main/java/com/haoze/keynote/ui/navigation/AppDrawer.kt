@@ -257,7 +257,7 @@ private fun DrawerGroupRow(
         label = "drawerGroupContentColor"
     )
     val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.surfaceContainer else colors.transparent,
+        targetValue = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else colors.transparent,
         animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing),
         label = "drawerGroupBackgroundColor"
     )
@@ -276,7 +276,7 @@ private fun DrawerGroupRow(
             .height(44.dp)
             .background(
                 color = backgroundColor,
-                shape = RoundedCornerShape(12.dp)
+                shape = MaterialTheme.shapes.medium
             )
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp),
@@ -323,7 +323,7 @@ private fun DrawerNavRow(
         label = "drawerNavContentColor"
     )
     val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.surfaceContainer else colors.transparent,
+        targetValue = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else colors.transparent,
         animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing),
         label = "drawerNavBackgroundColor"
     )
@@ -336,7 +336,7 @@ private fun DrawerNavRow(
             .height(44.dp)
             .background(
                 color = backgroundColor,
-                shape = RoundedCornerShape(12.dp)
+                shape = MaterialTheme.shapes.medium
             )
             .clickable(onClick = onClick)
             .padding(start = 36.dp, end = 12.dp),
@@ -374,7 +374,7 @@ private fun DrawerTagsSection(
         label = "drawerTagsContentColor"
     )
     val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) MaterialTheme.colorScheme.surfaceContainer else colors.transparent,
+        targetValue = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else colors.transparent,
         animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing),
         label = "drawerTagsBackgroundColor"
     )
@@ -392,7 +392,7 @@ private fun DrawerTagsSection(
             .height(44.dp)
             .background(
                 color = backgroundColor,
-                shape = RoundedCornerShape(12.dp)
+                shape = MaterialTheme.shapes.medium
             )
             .clickable(onClick = onToggle)
             .padding(start = 36.dp, end = 12.dp),

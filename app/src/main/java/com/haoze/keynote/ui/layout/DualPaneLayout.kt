@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.haoze.keynote.ui.theme.LocalAppColors
 
 @Composable
 fun DualPaneLayout(
@@ -17,7 +16,6 @@ fun DualPaneLayout(
     leftPane: @Composable (Modifier) -> Unit,
     rightPane: @Composable (Modifier) -> Unit
 ) {
-    val colors = LocalAppColors.current
     if (!isExpanded) {
         leftPane(Modifier.fillMaxSize())
         return
@@ -25,7 +23,7 @@ fun DualPaneLayout(
 
     var dividerPosition by remember { mutableStateOf(0.35f) }
     val dividerWidth = 8.dp
-    val dividerColor = colors.outlineVariant
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant
 
     val density = LocalDensity.current
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {

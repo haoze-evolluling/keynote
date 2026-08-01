@@ -32,6 +32,10 @@ fun SearchBar(
             }
         },
         singleLine = true,
-        colors = OutlinedTextFieldDefaults.colors()
+        shape = MaterialTheme.shapes.large,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        )
     )
 }

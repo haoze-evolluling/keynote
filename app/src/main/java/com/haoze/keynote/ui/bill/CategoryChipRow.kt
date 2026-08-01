@@ -53,7 +53,7 @@ fun CategoryChipRow(
         AlertDialog(
             onDismissRequest = { showAddDialog = false },
             title = { Text("新建类别") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = {

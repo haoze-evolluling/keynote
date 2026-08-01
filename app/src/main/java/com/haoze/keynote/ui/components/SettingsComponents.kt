@@ -40,7 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.haoze.keynote.R
 
-val SettingsCornerShape = RoundedCornerShape(12.dp)
+val SettingsCornerShape = RoundedCornerShape(10.dp)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +55,8 @@ fun SettingsScaffold(
 ) {
     Scaffold(
         modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         topBar = {
             TopAppBar(
                 title = { Text(title) },
@@ -118,7 +120,7 @@ fun SettingsGroupTitle(
         text = text,
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 32.dp, end = 32.dp, top = 24.dp, bottom = 8.dp),
+            .padding(start = 32.dp, end = 32.dp, top = 20.dp, bottom = 8.dp),
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )

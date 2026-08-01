@@ -435,7 +435,7 @@ private fun FeatureCard(title: String, icon: Painter, content: @Composable Colum
         modifier = Modifier
             .fillMaxWidth()
             .border(SpacingTokens.borderWidth, colors.outlineVariant, MaterialTheme.shapes.medium),
-        colors = CardDefaults.cardColors(containerColor = colors.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         elevation = CardDefaults.cardElevation(defaultElevation = SpacingTokens.cardElevation)
     ) {
         Column(

@@ -18,7 +18,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -88,10 +87,10 @@ fun AppNavigation() {
     ) {
         ModalNavigationDrawer(
             drawerState = drawerState,
-            scrimColor = Color.Black.copy(alpha = 0.2f),
+            scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f),
             drawerContent = {
                 ModalDrawerSheet(
-                    drawerContainerColor = MaterialTheme.colorScheme.surface,
+                    drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     drawerTonalElevation = 0.dp,
                     modifier = Modifier.width(260.dp)
                 ) {

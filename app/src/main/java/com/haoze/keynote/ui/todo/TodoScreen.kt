@@ -234,7 +234,7 @@ private fun TodoCard(
                 onLongClick = onLongClick
             ),
         border = BorderStroke(1.dp, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = colors.surface),
+        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
@@ -488,7 +488,7 @@ private fun TodoDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("取消") }
         },
-        containerColor = colors.surface,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
         shape = RoundedCornerShape(16.dp),
     )
@@ -535,7 +535,7 @@ private fun TodoDialog(
         AlertDialog(
             onDismissRequest = { showTimePicker = false },
             title = { Text("选择时间") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = { TimePicker(state = timePickerState) },

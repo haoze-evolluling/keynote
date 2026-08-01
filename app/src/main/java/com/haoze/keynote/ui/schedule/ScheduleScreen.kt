@@ -145,7 +145,7 @@ fun ScheduleScreen(
                                 .animateItem()
                                 .combinedClickable(onClick = {}, onLongClick = { showActionDialogForSchedule = schedule.id }),
                             border = BorderStroke(1.dp, colors.outlineVariant),
-                            colors = CardDefaults.outlinedCardColors(containerColor = colors.surface)
+                            colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -215,7 +215,7 @@ fun ScheduleScreen(
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = null },
             title = { Text("删除日程") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = { Text("确定要删除「${schedule.title}」吗？") },
@@ -285,7 +285,7 @@ fun ScheduleScreen(
         AlertDialog(
             onDismissRequest = { showLinkNoteDialog = null },
             title = { Text("选择关联笔记") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = {
@@ -326,7 +326,7 @@ fun ScheduleScreen(
                 pendingAiScheduleId = null
             },
             title = { Text("AI 生成笔记预览") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = {
@@ -575,7 +575,7 @@ private fun ScheduleDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("取消") }
         },
-        containerColor = colors.surface,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
         shape = RoundedCornerShape(16.dp),
     )
@@ -610,7 +610,7 @@ private fun ScheduleDialog(
         AlertDialog(
             onDismissRequest = { showTimePicker = false },
             title = { Text("选择时间") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = { TimePicker(state = timePickerState) },
@@ -662,7 +662,7 @@ private fun ScheduleDialog(
         AlertDialog(
             onDismissRequest = { showEndTimePicker = false },
             title = { Text("选择结束时间") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = { TimePicker(state = endTimePickerState) },

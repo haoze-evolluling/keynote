@@ -161,7 +161,7 @@ fun HabitScreen(
         AlertDialog(
             onDismissRequest = { habitToDelete = null },
             title = { Text("删除习惯") },
-            containerColor = colors.surface,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
             shape = RoundedCornerShape(16.dp),
             text = { Text("确定要删除「${habit.title}」吗？删除后可在回收站中恢复。") },
@@ -259,7 +259,7 @@ private fun HabitCard(
             .fillMaxWidth()
             .clickable(onClick = onToggle),
         border = BorderStroke(1.dp, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = colors.surface),
+        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -348,7 +348,7 @@ private fun HabitEditorDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (habit == null) "新建习惯" else "编辑习惯") },
-        containerColor = colors.surface,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
         shape = RoundedCornerShape(16.dp),
         text = {
