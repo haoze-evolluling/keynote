@@ -5,6 +5,7 @@
 .DS_Store
 build/
 /captures
+.codebase-memory/
 .externalNativeBuild
 .cxx
 local.properties

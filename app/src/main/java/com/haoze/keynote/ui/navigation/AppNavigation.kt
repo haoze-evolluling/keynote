@@ -1,11 +1,5 @@
 package com.haoze.keynote.ui.navigation
 
-import android.net.Uri
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,40 +13,31 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.haoze.keynote.ui.home.HomeScreen
-import com.haoze.keynote.ui.home.FeatureHomeScreen
-import com.haoze.keynote.ui.habit.HabitScreen
-import com.haoze.keynote.ui.edit.EditNoteScreen
-import com.haoze.keynote.ui.settings.SettingsScreen
-import com.haoze.keynote.ui.settings.AiProviderManageScreen
-import com.haoze.keynote.ui.tag.TagNotesScreen
-import com.haoze.keynote.ui.chat.AIChatScreen
 import com.haoze.keynote.ui.bill.AaSplitScreen
 import com.haoze.keynote.ui.bill.BillScreen
 import com.haoze.keynote.ui.bill.BillStatsScreen
-import com.haoze.keynote.ui.trash.TrashScreen
+import com.haoze.keynote.ui.chat.AIChatScreen
+import com.haoze.keynote.ui.edit.EditNoteScreen
+import com.haoze.keynote.ui.habit.HabitScreen
 import com.haoze.keynote.ui.home.DateGroupNotesScreen
 import com.haoze.keynote.ui.home.ExportDataScreen
+import com.haoze.keynote.ui.home.FeatureHomeScreen
+import com.haoze.keynote.ui.home.HomeScreen
 import com.haoze.keynote.ui.schedule.ScheduleScreen
+import com.haoze.keynote.ui.settings.AiProviderManageScreen
+import com.haoze.keynote.ui.settings.SettingsScreen
+import com.haoze.keynote.ui.tag.TagNotesScreen
 import com.haoze.keynote.ui.todo.TodoScreen
 import com.haoze.keynote.ui.toolbox.KnowledgeVaultScreen
-import com.haoze.keynote.ui.theme.MotionTokens
+import com.haoze.keynote.ui.trash.TrashScreen
 import com.haoze.keynote.viewmodel.SettingsViewModel
-import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 sealed class Screen(val route: String, val title: String) {
     data object FeatureHome : Screen("feature_home", "首页")
     data object Home : Screen("home", "笔记")
-    data object EditNote : Screen("edit_note?noteId={noteId}", "编辑笔记") {
-        fun createRoute(noteId: Long) = "edit_note?noteId=$noteId"
-    }
+    data object EditNote : Screen("edit_note", "编辑笔记")
     data object AIChat : Screen("ai_chat", "AI对话")
     data object Bill : Screen("bill", "记账")
     data object BillStats : Screen("bill_stats", "账单统计")
@@ -61,9 +46,7 @@ sealed class Screen(val route: String, val title: String) {
     data object Settings : Screen("settings", "设置")
     data object AiProviderManage : Screen("ai_provider_manage", "AI厂商管理")
     data object Todo : Screen("todo", "待办事项")
-    data object TagNotes : Screen("tag_notes/{tagId}/{tagName}", "标签笔记") {
-        fun createRoute(tagId: Long, tagName: String) = "tag_notes/$tagId/${Uri.encode(tagName)}"
-    }
+    data object TagNotes : Screen("tag_notes", "标签笔记")
     data object KnowledgeVault : Screen("knowledge_vault", "资料库")
     data object DateGroupNotes : Screen("date_group_notes", "按日期查看")
     data object Trash : Screen("trash", "回收站")
@@ -73,18 +56,17 @@ sealed class Screen(val route: String, val title: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
+fun AppPage(
+    route: String,
+    noteId: Long? = null,
+    tagId: Long? = null,
+    tagName: String? = null,
+    onNavigate: (String, Long?, Long?, String?, Boolean) -> Unit,
+    onBack: () -> Unit,
+) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
-    val navBackStackEntry = navController.currentBackStackEntryAsState().value
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    CompositionLocalProvider(
-        LocalDrawerState provides drawerState,
-        LocalDrawerScope provides scope
-    ) {
+    CompositionLocalProvider(LocalDrawerState provides drawerState, LocalDrawerScope provides scope) {
         ModalNavigationDrawer(
             drawerState = drawerState,
             scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f),
@@ -95,178 +77,67 @@ fun AppNavigation() {
                     modifier = Modifier.width(260.dp)
                 ) {
                     AppDrawerContent(
-                        currentRoute = currentRoute,
-                        onNavigateToRoute = { route ->
-                            navController.navigate(route) {
-                                popUpTo(Screen.FeatureHome.route) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        onNavigateToTag = { tagId, tagName ->
-                            navController.navigate(Screen.TagNotes.createRoute(tagId, tagName)) {
-                                popUpTo(Screen.FeatureHome.route) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        onCloseDrawer = {
-                            scope.launch { drawerState.close() }
-                        }
+                        currentRoute = route,
+                        onNavigateToRoute = { target -> onNavigate(target, null, null, null, true) },
+                        onNavigateToTag = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, true) },
+                        onCloseDrawer = { scope.launch { drawerState.close() } }
                     )
                 }
             }
         ) {
-            NavHost(
-                navController = navController,
-                startDestination = Screen.FeatureHome.route,
-                modifier = Modifier,
-                enterTransition = {
-                    fadeIn(animationSpec = tween(MotionTokens.DurationMedium, easing = MotionTokens.StandardEasing)) +
-                        slideInHorizontally(
-                            initialOffsetX = { it / 6 },
-                            animationSpec = tween(MotionTokens.DurationMedium, easing = MotionTokens.StandardEasing)
-                        )
-                },
-                exitTransition = {
-                    fadeOut(animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing)) +
-                        slideOutHorizontally(
-                            targetOffsetX = { -it / 12 },
-                            animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing)
-                        )
-                },
-                popEnterTransition = {
-                    fadeIn(animationSpec = tween(MotionTokens.DurationMedium, easing = MotionTokens.StandardEasing)) +
-                        slideInHorizontally(
-                            initialOffsetX = { -it / 6 },
-                            animationSpec = tween(MotionTokens.DurationMedium, easing = MotionTokens.StandardEasing)
-                        )
-                },
-                popExitTransition = {
-                    fadeOut(animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing)) +
-                        slideOutHorizontally(
-                            targetOffsetX = { it / 6 },
-                            animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing)
-                        )
-                }
-            ) {
-                composable(Screen.FeatureHome.route) {
-                    FeatureHomeScreen(
-                        onNavigateToRoute = { route ->
-                            navController.navigate(route) {
-                                popUpTo(Screen.FeatureHome.route) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-                composable(Screen.Home.route) {
-                    HomeScreen(
-                        onNavigateToEdit = { noteId ->
-                            navController.navigate(Screen.EditNote.createRoute(noteId))
-                        },
-                        onNavigateToTagNotes = { tagId, tagName ->
-                            navController.navigate(Screen.TagNotes.createRoute(tagId, tagName))
-                        }
-                    )
-                }
-                composable(
-                    route = Screen.EditNote.route,
-                    arguments = listOf(navArgument("noteId") {
-                        type = NavType.LongType
-                    })
-                ) { backStackEntry ->
-                    val noteId = backStackEntry.arguments?.getLong("noteId") ?: return@composable
-                    EditNoteScreen(
-                        noteId = noteId,
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
-                composable(Screen.AIChat.route) {
-                    AIChatScreen(
-                        onCreateNote = { noteId ->
-                            navController.navigate(Screen.EditNote.createRoute(noteId))
-                        }
-                    )
-                }
-                composable(Screen.Bill.route) {
-                    BillScreen()
-                }
-                composable(Screen.BillStats.route) {
-                    BillStatsScreen()
-                }
-                composable(Screen.AaSplit.route) {
-                    AaSplitScreen()
-                }
-                composable(Screen.Habit.route) {
-                    HabitScreen(viewModel = koinViewModel())
-                }
-                composable(Screen.DateGroupNotes.route) {
-                    DateGroupNotesScreen(
-                        onNavigateToEdit = { noteId ->
-                            navController.navigate(Screen.EditNote.createRoute(noteId))
-                        },
-                        onNavigateToTagNotes = { tagId, tagName ->
-                            navController.navigate(Screen.TagNotes.createRoute(tagId, tagName))
-                        }
-                    )
-                }
-                composable(Screen.Trash.route) {
-                    TrashScreen()
-                }
-                composable(Screen.DataExport.route) {
-                    ExportDataScreen()
-                }
-                composable(Screen.Todo.route) {
-                    TodoScreen(viewModel = koinViewModel())
-                }
-                composable(Screen.Schedule.route) {
-                    ScheduleScreen(viewModel = koinViewModel())
-                }
-                composable(Screen.KnowledgeVault.route) {
-                    KnowledgeVaultScreen()
-                }
-                composable(Screen.Settings.route) {
-                    SettingsScreen(
-                        onNavigateToProviderManage = { navController.navigate(Screen.AiProviderManage.route) }
-                    )
-                }
-                composable(Screen.AiProviderManage.route) {
-                    val settingsViewModel: SettingsViewModel = koinViewModel()
-                    val providers = settingsViewModel.providers.collectAsState().value
-                    val activeProviderId = settingsViewModel.activeProviderId.collectAsState().value
-
-                    AiProviderManageScreen(
-                        onNavigateBack = { navController.popBackStack() },
-                        providers = providers,
-                        activeProviderId = activeProviderId,
-                        onSelectProvider = { settingsViewModel.selectProvider(it) },
-                        onUpdateProvider = { settingsViewModel.updateProvider(it) },
-                        onDeleteProvider = { settingsViewModel.deleteCustomProvider(it) },
-                        onAddProvider = { name, url, model, key -> settingsViewModel.addCustomProvider(name, url, model, key) },
-                        sealKey = { settingsViewModel.sealZidaipass(it) },
-                        openKey = { settingsViewModel.openZidaipass(it) }
-                    )
-                }
-                composable(
-                    route = Screen.TagNotes.route,
-                    arguments = listOf(
-                        navArgument("tagId") { type = NavType.LongType },
-                        navArgument("tagName") { type = NavType.StringType }
-                    )
-                ) { backStackEntry ->
-                    val tagId = backStackEntry.arguments?.getLong("tagId") ?: return@composable
-                    val tagName = Uri.decode(backStackEntry.arguments?.getString("tagName") ?: "")
-                    TagNotesScreen(
-                        tagId = tagId,
-                        tagName = tagName,
-                        onNavigateToEdit = { noteId ->
-                            noteId?.let { navController.navigate(Screen.EditNote.createRoute(it)) }
-                        }
-                    )
-                }
+            when (route) {
+                Screen.FeatureHome.route -> FeatureHomeScreen(
+                    onNavigateToRoute = { target -> onNavigate(target, null, null, null, true) }
+                )
+                Screen.Home.route -> HomeScreen(
+                    onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
+                    onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
+                )
+                Screen.EditNote.route -> noteId?.let { EditNoteScreen(it, onNavigateBack = onBack) }
+                Screen.AIChat.route -> AIChatScreen { id -> onNavigate(Screen.EditNote.route, id, null, null, false) }
+                Screen.Bill.route -> BillScreen()
+                Screen.BillStats.route -> BillStatsScreen()
+                Screen.AaSplit.route -> AaSplitScreen()
+                Screen.Habit.route -> HabitScreen(viewModel = koinViewModel())
+                Screen.DateGroupNotes.route -> DateGroupNotesScreen(
+                    onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
+                    onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
+                )
+                Screen.Trash.route -> TrashScreen()
+                Screen.DataExport.route -> ExportDataScreen()
+                Screen.Todo.route -> TodoScreen(viewModel = koinViewModel())
+                Screen.Schedule.route -> ScheduleScreen(viewModel = koinViewModel())
+                Screen.KnowledgeVault.route -> KnowledgeVaultScreen()
+                Screen.Settings.route -> SettingsScreen(
+                    onNavigateToProviderManage = {
+                        onNavigate(Screen.AiProviderManage.route, null, null, null, false)
+                    }
+                )
+                Screen.AiProviderManage.route -> ProviderManagePage(onBack)
+                Screen.TagNotes.route -> if (tagId != null) TagNotesScreen(
+                    tagId = tagId,
+                    tagName = tagName.orEmpty(),
+                    onNavigateToEdit = { id -> id?.let { onNavigate(Screen.EditNote.route, it, null, null, false) } }
+                )
             }
         }
     }
+}
+
+@Composable
+private fun ProviderManagePage(onBack: () -> Unit) {
+    val viewModel: SettingsViewModel = koinViewModel()
+    val providers = viewModel.providers.collectAsState().value
+    val activeProviderId = viewModel.activeProviderId.collectAsState().value
+    AiProviderManageScreen(
+        onNavigateBack = onBack,
+        providers = providers,
+        activeProviderId = activeProviderId,
+        onSelectProvider = viewModel::selectProvider,
+        onUpdateProvider = viewModel::updateProvider,
+        onDeleteProvider = viewModel::deleteCustomProvider,
+        onAddProvider = { name, url, model, key -> viewModel.addCustomProvider(name, url, model, key) },
+        sealKey = viewModel::sealZidaipass,
+        openKey = viewModel::openZidaipass
+    )
 }

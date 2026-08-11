@@ -99,7 +99,7 @@ internal fun AppDrawerContent(
     }
 
     var expandedGroups by remember(currentRoute) { mutableStateOf(defaultExpandedGroups(currentRoute, drawerGroups)) }
-    val isTagSelected = remember(currentRoute) { currentRoute?.startsWith("tag_notes/") == true }
+    val isTagSelected = remember(currentRoute) { currentRoute == Screen.TagNotes.route }
 
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())

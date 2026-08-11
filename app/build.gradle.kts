@@ -16,8 +16,8 @@ android {
         applicationId = "com.haoze.keynote"
         minSdk = 28
         targetSdk = 36
-        versionCode = 20100
-        versionName = "2.1.0"
+        versionCode = 20300
+        versionName = "2.3.0"
     }
 
     signingConfigs {
@@ -65,7 +65,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

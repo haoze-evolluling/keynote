@@ -34,6 +34,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".NotesActivity" />
+        <activity android:name=".EditNoteActivity" />
+        <activity android:name=".AiChatActivity" />
+        <activity android:name=".BillActivity" />
+        <activity android:name=".BillStatsActivity" />
+        <activity android:name=".AaSplitActivity" />
+        <activity android:name=".HabitActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".AiProviderManageActivity" />
+        <activity android:name=".TodoActivity" />
+        <activity android:name=".TagNotesActivity" />
+        <activity android:name=".KnowledgeVaultActivity" />
+        <activity android:name=".DateGroupNotesActivity" />
+        <activity android:name=".TrashActivity" />
+        <activity android:name=".DataExportActivity" />
+        <activity android:name=".ScheduleActivity" />
 
         <receiver
             android:name=".receiver.TrashCleanupReceiver"
