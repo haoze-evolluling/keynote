@@ -1,6 +1,5 @@
 package com.haoze.keynote.ui.trash
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +18,6 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.launch
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
-import com.haoze.keynote.ui.components.SettingsCornerShape
 import com.haoze.keynote.ui.components.SettingsInfoText
 import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
@@ -51,7 +49,7 @@ fun TrashScreen(
                 Text(
                     "回收站为空",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = colors.outline
+                    color = colors.onSurfaceVariant
                 )
             }
         } else {
@@ -60,8 +58,8 @@ fun TrashScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
                     .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(vertical = 12.dp)
             ) {
                 item {
                     SettingsInfoText(
@@ -83,12 +81,12 @@ fun TrashScreen(
                         System.currentTimeMillis() - item.deletedAt
                     ).toInt())
 
-                    OutlinedCard(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        border = BorderStroke(1.dp, colors.outlineVariant),
-                        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                        shape = SettingsCornerShape
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             when (item) {
@@ -127,7 +125,7 @@ fun TrashScreen(
             },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 }
@@ -144,9 +142,9 @@ private fun AIChatTrashContent(
             painterResource(R.drawable.ic_chat_bubble),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = colors.outline
+            tint = colors.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = item.data.title.ifBlank { "AI 对话" },
             style = MaterialTheme.typography.titleMedium,
@@ -160,7 +158,7 @@ private fun AIChatTrashContent(
     Text(
         text = dateFormat.format(Date(item.data.updatedAt)),
         style = MaterialTheme.typography.bodySmall,
-        color = colors.outline
+        color = colors.onSurfaceVariant
     )
 }
 
@@ -172,9 +170,9 @@ private fun NoteTrashContent(item: TrashItem.TrashNote, remainingDays: Int, date
             painterResource(R.drawable.ic_description),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = colors.outline
+            tint = colors.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = item.data.note.title.ifBlank { "无标题" },
             style = MaterialTheme.typography.titleMedium,
@@ -188,7 +186,7 @@ private fun NoteTrashContent(item: TrashItem.TrashNote, remainingDays: Int, date
     Text(
         text = dateFormat.format(Date(item.data.note.updatedAt)),
         style = MaterialTheme.typography.bodySmall,
-        color = colors.outline
+        color = colors.onSurfaceVariant
     )
 }
 
@@ -200,9 +198,9 @@ private fun BillTrashContent(item: TrashItem.TrashBill, remainingDays: Int, date
             painterResource(R.drawable.ic_receipt),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = colors.outline
+            tint = colors.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "¥%.2f".format(item.data.amount),
             style = MaterialTheme.typography.titleMedium,
@@ -222,7 +220,7 @@ private fun BillTrashContent(item: TrashItem.TrashBill, remainingDays: Int, date
     Text(
         text = dateFormat.format(Date(item.data.date)),
         style = MaterialTheme.typography.bodySmall,
-        color = colors.outline
+        color = colors.onSurfaceVariant
     )
 }
 
@@ -234,9 +232,9 @@ private fun ScheduleTrashContent(item: TrashItem.TrashSchedule, remainingDays: I
             painterResource(R.drawable.ic_event),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = colors.outline
+            tint = colors.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = item.data.title,
             style = MaterialTheme.typography.titleMedium,
@@ -254,14 +252,14 @@ private fun ScheduleTrashContent(item: TrashItem.TrashSchedule, remainingDays: I
     Text(
         text = dateText,
         style = MaterialTheme.typography.bodySmall,
-        color = colors.outline
+        color = colors.onSurfaceVariant
     )
     item.data.location?.let { location ->
         if (location.isNotBlank()) {
             Text(
                 text = location,
                 style = MaterialTheme.typography.bodySmall,
-                color = colors.outline
+                color = colors.onSurfaceVariant
             )
         }
     }
@@ -275,9 +273,9 @@ private fun TodoTrashContent(item: TrashItem.TrashTodo, remainingDays: Int, date
             painterResource(R.drawable.ic_check_circle),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = colors.outline
+            tint = colors.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = item.data.title.ifBlank { "无标题" },
             style = MaterialTheme.typography.titleMedium,
@@ -292,7 +290,7 @@ private fun TodoTrashContent(item: TrashItem.TrashTodo, remainingDays: Int, date
         Text(
             text = "截止日期: ${dateFormat.format(Date(dueDate))}",
             style = MaterialTheme.typography.bodySmall,
-            color = colors.outline
+            color = colors.onSurfaceVariant
         )
     }
 }
@@ -305,9 +303,9 @@ private fun HabitTrashContent(item: TrashItem.TrashHabit, remainingDays: Int, da
             painterResource(R.drawable.ic_check_circle),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = colors.outline
+            tint = colors.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = item.data.title.ifBlank { "无标题" },
             style = MaterialTheme.typography.titleMedium,
@@ -321,7 +319,7 @@ private fun HabitTrashContent(item: TrashItem.TrashHabit, remainingDays: Int, da
     Text(
         text = dateFormat.format(Date(item.data.updatedAt)),
         style = MaterialTheme.typography.bodySmall,
-        color = colors.outline
+        color = colors.onSurfaceVariant
     )
 }
 

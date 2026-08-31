@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,10 +27,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,8 +44,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.KnowledgeVaultEntity
+import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.LocalAppColors
@@ -61,17 +63,9 @@ fun KnowledgeVaultScreen() {
     val scope = LocalDrawerScope.current
     val viewModel: KnowledgeVaultViewModel = koinViewModel()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("资料库") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        }
+    DrawerScaffold(
+        title = "资料库",
+        onMenuClick = { scope.launch { drawerState.open() } }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -132,7 +126,7 @@ private fun KnowledgeVaultContent(viewModel: KnowledgeVaultViewModel) {
                 Text(
                     "未找到匹配的资料",
                     style = MaterialTheme.typography.bodySmall,
-                    color = colors.outline
+                    color = colors.onSurfaceVariant
                 )
             } else {
                 Text(
@@ -284,35 +278,43 @@ private fun VaultStatChip(
     accentColor: Color
 ) {
     val colors = LocalAppColors.current
-    Row(
-        modifier = Modifier
-            .border(
-                SpacingTokens.borderWidth,
-                colors.outlineVariant,
-                MaterialTheme.shapes.small
-            )
-            .padding(horizontal = SpacingTokens.smallSpacing, vertical = SpacingTokens.tinySpacing),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        modifier = Modifier.border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
+        color = colors.surface,
+        shadowElevation = 0.dp,
+        tonalElevation = 0.dp
     ) {
-        Icon(
-            painter = icon,
-            contentDescription = null,
-            modifier = Modifier.size(SpacingTokens.iconSmall),
-            tint = accentColor
-        )
-        Spacer(Modifier.width(SpacingTokens.tinySpacing))
-        Text(
-            "$count",
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            color = colors.onSurface
-        )
-        Spacer(Modifier.width(SpacingTokens.tinySpacing))
-        Text(
-            label,
-            style = MaterialTheme.typography.labelSmall,
-            color = colors.onSurfaceVariant
-        )
+        Row(
+            modifier = Modifier.padding(
+                horizontal = SpacingTokens.smallSpacing,
+                vertical = SpacingTokens.tinySpacing
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                modifier = Modifier.size(SpacingTokens.iconSmall),
+                tint = accentColor
+            )
+            Spacer(Modifier.width(SpacingTokens.tinySpacing))
+            Text(
+                "$count",
+                // FlowRow 内小卡空间有限，按规范以 22sp ExtraBold 靠拢 28sp 数值层级
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold
+                ),
+                color = colors.onSurface
+            )
+            Spacer(Modifier.width(SpacingTokens.tinySpacing))
+            Text(
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -334,7 +336,7 @@ private fun VaultListCard(
             Text(
                 "暂无内容，点击下方添加",
                 style = MaterialTheme.typography.bodySmall,
-                color = colors.outline
+                color = colors.onSurfaceVariant
             )
         } else {
             items.forEachIndexed { index, item ->
@@ -382,7 +384,7 @@ private fun VaultListCard(
                             painterResource(R.drawable.ic_delete),
                             contentDescription = "删除",
                             modifier = Modifier.size(16.dp),
-                            tint = colors.outline
+                            tint = colors.onSurfaceVariant
                         )
                     }
                 }
@@ -421,7 +423,7 @@ private fun VaultListCard(
                 Icon(
                     if (editIndex >= 0) painterResource(R.drawable.ic_check) else painterResource(R.drawable.ic_add),
                     contentDescription = if (editIndex >= 0) "确认编辑" else "添加",
-                    tint = if (input.isNotBlank()) colors.primary else colors.outline
+                    tint = if (input.isNotBlank()) colors.primary else colors.onSurfaceVariant
                 )
             }
         }
@@ -432,11 +434,11 @@ private fun VaultListCard(
 private fun FeatureCard(title: String, icon: Painter, content: @Composable ColumnScope.() -> Unit) {
     val colors = LocalAppColors.current
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(SpacingTokens.borderWidth, colors.outlineVariant, MaterialTheme.shapes.medium),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        elevation = CardDefaults.cardElevation(defaultElevation = SpacingTokens.cardElevation)
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
     ) {
         Column(
             Modifier.padding(SpacingTokens.screenPadding),

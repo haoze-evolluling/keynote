@@ -3,7 +3,6 @@ package com.haoze.keynote.ui.bill
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import android.content.ClipData
 import android.content.ClipboardManager
+import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.DialogContent
@@ -59,31 +59,21 @@ fun BillScreen(
     var showEditDialogForBill by remember { mutableStateOf<BillEntity?>(null) }
     var showBillDetailsForBill by remember { mutableStateOf<BillEntity?>(null) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("账单") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        },
+    DrawerScaffold(
+        title = "账单",
+        onMenuClick = { scope.launch { drawerState.open() } },
         floatingActionButton = {
-            Box(modifier = Modifier.padding(bottom = 64.dp)) {
-                FloatingActionButton(
-                    onClick = { showCreateDialog = true },
-                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
-                ) { Icon(painterResource(R.drawable.ic_add), contentDescription = "新建账单") }
-            }
+            FloatingActionButton(
+                onClick = { showCreateDialog = true },
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
+            ) { Icon(painterResource(R.drawable.ic_add), contentDescription = "新建账单") }
         }
     ) { innerPadding ->
         if (bills.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 contentAlignment = Alignment.Center
-            ) { Text("暂无账单记录", style = MaterialTheme.typography.bodyLarge, color = colors.outline) }
+            ) { Text("暂无账单记录", style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant) }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
@@ -139,7 +129,7 @@ fun BillScreen(
             dismissButton = { TextButton(onClick = { showDeleteConfirm = null }) { Text("取消") } },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 
@@ -152,22 +142,22 @@ fun BillScreen(
                 title = { Text("账单详情") },
                 text = {
                     DialogContent(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("消费项目", style = ModalTokens.labelTextStyle, color = colors.outline)
+                        Text("消费项目", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                         Text(bill.item, style = ModalTokens.bodyTextStyle, fontWeight = FontWeight.SemiBold)
                         if (!rawBill?.catName.isNullOrBlank()) {
-                            Text("类别", style = ModalTokens.labelTextStyle, color = colors.outline)
+                            Text("类别", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                             Text(rawBill!!.catName!!, style = ModalTokens.bodyTextStyle)
                         }
-                        Text("金额", style = ModalTokens.labelTextStyle, color = colors.outline)
+                        Text("金额", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                         Text("¥${String.format("%.2f", bill.amount)}", style = ModalTokens.bodyTextStyle, fontWeight = FontWeight.Bold, color = colors.primary)
-                        Text("时间", style = ModalTokens.labelTextStyle, color = colors.outline)
+                        Text("时间", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                         Text(dateFormat.format(Date(bill.date)), style = ModalTokens.bodyTextStyle)
                     }
                 },
                 confirmButton = { TextButton(onClick = { showBillDetailsForBill = null }) { Text("关闭") } },
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 textContentColor = colors.onSurface,
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(28.dp),
             )
         }
     }
@@ -273,7 +263,7 @@ private fun BillFormDialog(
         dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
     )
 
     if (showDatePicker) {
@@ -315,7 +305,7 @@ private fun BillFormDialog(
             dismissButton = { TextButton(onClick = { showTimePicker = false }) { Text("取消") } },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 }
@@ -357,11 +347,13 @@ private fun BillCard(
     onLongClick: () -> Unit
 ) {
     val colors = LocalAppColors.current
-    OutlinedCard(
+    Card(
         modifier = Modifier.fillMaxWidth()
             .combinedClickable(onClick = {}, onLongClick = onLongClick),
-        border = BorderStroke(1.dp, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
@@ -371,7 +363,7 @@ private fun BillCard(
                     AssistChip(onClick = {}, label = { Text(categoryName, style = MaterialTheme.typography.labelSmall) }, modifier = Modifier.height(24.dp))
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = dateFormat.format(Date(bill.date)), style = MaterialTheme.typography.bodySmall, color = colors.outline)
+                Text(text = dateFormat.format(Date(bill.date)), style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
             }
             Text(
                 text = "¥${String.format("%.2f", bill.amount)}",

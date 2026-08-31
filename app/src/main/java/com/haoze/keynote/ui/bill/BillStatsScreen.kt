@@ -1,8 +1,9 @@
 package com.haoze.keynote.ui.bill
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.LocalAppColors
@@ -44,17 +46,9 @@ fun BillStatsScreen(
 
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("账单统计") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        }
+    DrawerScaffold(
+        title = "账单统计",
+        onMenuClick = { scope.launch { drawerState.open() } }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -80,13 +74,15 @@ fun BillStatsScreen(
                             selectedPreset = preset
                             viewModel.setPresetRange(preset)
                         },
-                        label = { Text(label) }
+                        label = { Text(label) },
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
                 FilterChip(
                     selected = selectedPreset == RangePreset.CUSTOM,
                     onClick = { showCustomRangePicker = true },
                     label = { Text("自定义") },
+                    shape = RoundedCornerShape(12.dp),
                     trailingIcon = { Icon(painterResource(R.drawable.ic_date_range), contentDescription = null, modifier = Modifier.size(16.dp)) }
                 )
             }
@@ -95,7 +91,7 @@ fun BillStatsScreen(
                 Text(
                     "${dateFormat.format(Date(dateRange.first))} ~ ${dateFormat.format(Date(dateRange.second))}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = colors.outline
+                    color = colors.onSurfaceVariant
                 )
             }
 
@@ -156,7 +152,8 @@ fun BillStatsScreen(
                         FilterChip(
                             selected = granularity == g,
                             onClick = { viewModel.setGranularity(g) },
-                            label = { Text(label) }
+                            label = { Text(label) },
+                            shape = RoundedCornerShape(12.dp)
                         )
                     }
                 }
@@ -234,20 +231,31 @@ private fun SummaryCard(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
-    OutlinedCard(
-        modifier = modifier,
-        border = BorderStroke(1.dp, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+    Surface(
+        modifier = modifier.border(
+            1.dp,
+            MaterialTheme.colorScheme.outline.copy(alpha = 0.45f),
+            RoundedCornerShape(12.dp)
+        ),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 0.dp,
+        tonalElevation = 0.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = colors.outline)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = color)
+            Text(
+                value,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = color
+            )
         }
     }
 }

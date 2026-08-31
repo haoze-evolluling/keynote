@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,6 +28,7 @@ import com.haoze.keynote.data.db.entity.TodoCategoryEntity
 import com.haoze.keynote.data.db.entity.TodoEntity
 import com.haoze.keynote.ui.common.ActionRow
 import com.haoze.keynote.ui.common.ActionMenuDialog
+import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
@@ -59,25 +59,15 @@ fun TodoScreen(
 
     val groupedTodos = remember(todos) { groupTodosByDate(todos) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("待办事项") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        },
+    DrawerScaffold(
+        title = "待办事项",
+        onMenuClick = { scope.launch { drawerState.open() } },
         floatingActionButton = {
-            Box(modifier = Modifier.padding(bottom = 64.dp)) {
-                FloatingActionButton(
-                    onClick = { viewModel.openCreateDialog() },
-                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
-                ) {
-                    Icon(painterResource(R.drawable.ic_add), contentDescription = "添加待办")
-                }
+            FloatingActionButton(
+                onClick = { viewModel.openCreateDialog() },
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
+            ) {
+                Icon(painterResource(R.drawable.ic_add), contentDescription = "添加待办")
             }
         },
         containerColor = colors.background
@@ -87,7 +77,11 @@ fun TodoScreen(
                 modifier = Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("暂无待办事项", color = colors.onSurfaceVariant)
+                Text(
+                    "暂无待办事项",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.onSurfaceVariant
+                )
             }
         } else {
             LazyColumn(
@@ -225,7 +219,7 @@ private fun TodoCard(
     val dateDf = remember { SimpleDateFormat("M月d日", Locale.CHINESE) }
     val dateTimeDf = remember { SimpleDateFormat("M月d日 HH:mm", Locale.CHINESE) }
 
-    OutlinedCard(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
@@ -233,9 +227,10 @@ private fun TodoCard(
                 onClick = onToggle,
                 onLongClick = onLongClick
             ),
-        border = BorderStroke(1.dp, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -307,16 +302,14 @@ private fun TodoActionBottomSheet(
     onToggleComplete: () -> Unit
 ) {
     ActionMenuDialog(title = "待办操作", onDismiss = onDismiss) {
-            ActionRow(painterResource(R.drawable.ic_edit), "编辑", onEdit, rowHeight = 48.dp, horizontalPadding = 16.dp)
+            ActionRow(painterResource(R.drawable.ic_edit), "编辑", onEdit)
             ActionRow(
                 painterResource(R.drawable.ic_done),
                 if (todo.isCompleted) "标记未完成" else "标记完成",
-                onToggleComplete,
-                rowHeight = 48.dp,
-                horizontalPadding = 16.dp
+                onToggleComplete
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
-            ActionRow(painterResource(R.drawable.ic_delete), "删除", onDelete, isDestructive = true, rowHeight = 48.dp, horizontalPadding = 16.dp)
+            ActionRow(painterResource(R.drawable.ic_delete), "删除", onDelete, isDestructive = true)
     }
 }
 
@@ -490,7 +483,7 @@ private fun TodoDialog(
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
     )
 
     if (showDatePicker) {
@@ -499,7 +492,7 @@ private fun TodoDialog(
         )
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let {
@@ -537,7 +530,7 @@ private fun TodoDialog(
             title = { Text("选择时间") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = { TimePicker(state = timePickerState) },
             confirmButton = {
                 TextButton(onClick = {

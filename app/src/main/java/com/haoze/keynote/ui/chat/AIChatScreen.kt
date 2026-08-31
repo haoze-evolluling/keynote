@@ -160,7 +160,7 @@ fun AIChatScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.surface),
                 navigationIcon = {
                     IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu_outlined), contentDescription = "菜单")
+                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
                     }
                 },
                 actions = {
@@ -180,9 +180,7 @@ fun AIChatScreen(
                             onClick = {
                                 viewModel.switchAssistant(type)
                                 assistantMenuExpanded = false
-                            },
-                            rowHeight = 48.dp,
-                            horizontalPadding = 16.dp
+                            }
                         )
                     }
                 }
@@ -193,26 +191,26 @@ fun AIChatScreen(
                     ActionRow(painterResource(R.drawable.ic_history_outlined), "历史对话", {
                         actionsMenuExpanded = false
                         showHistoryDialog = true
-                    }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                    })
                     if (messages.isNotEmpty()) {
                         ActionRow(painterResource(R.drawable.ic_edit_outlined), "保存对话", {
                             actionsMenuExpanded = false
                             isCreatingNote = true
                             viewModel.createNoteFromMessages()
-                        }, enabled = !isCreatingNote, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                        }, enabled = !isCreatingNote)
                         ActionRow(painterResource(R.drawable.ic_delete_outlined), "删除对话", {
                             actionsMenuExpanded = false
                             showDeleteConversationConfirm = true
-                        }, isDestructive = true, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                        }, isDestructive = true)
                     }
                     ActionRow(painterResource(R.drawable.ic_refresh_outlined), "重新生成", {
                         actionsMenuExpanded = false
                         viewModel.regenerateLastResponse()
-                    }, enabled = !isLoading && messages.any { it.role == "user" }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                    }, enabled = !isLoading && messages.any { it.role == "user" })
                     ActionRow(painterResource(R.drawable.ic_chat_outlined_mirrored), "新对话", {
                         actionsMenuExpanded = false
                         if (messages.isEmpty()) viewModel.clearMessages() else showNewConversationConfirm = true
-                    }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                    })
                 }
             }
         }
@@ -275,7 +273,7 @@ fun AIChatScreen(
                     title = { Text("开始新对话") },
                     containerColor = colors.surface,
                     textContentColor = colors.onSurface,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(28.dp),
                     text = { Text("当前对话已自动保存到历史记录。开始新对话后，可以从历史对话继续回来。") },
                     confirmButton = {
                         TextButton(onClick = {
@@ -295,7 +293,7 @@ fun AIChatScreen(
                     title = { Text("删除对话") },
                     containerColor = colors.surface,
                     textContentColor = colors.onSurface,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(28.dp),
                     text = { Text("删除后会进入回收站，可在回收站中恢复或永久删除。") },
                     confirmButton = {
                         TextButton(onClick = {
@@ -344,7 +342,7 @@ private fun AIChatHistoryDialog(
         title = { Text("历史对话") },
         containerColor = colors.surface,
         textContentColor = colors.onSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         text = {
             DialogContent(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
@@ -398,8 +396,8 @@ private fun AIChatHistoryRow(
 
     Surface(
         onClick = onOpen,
-        shape = RoundedCornerShape(16.dp),
-        color = colors.surfaceVariant.copy(alpha = 0.55f),
+        shape = RoundedCornerShape(12.dp),
+        color = colors.surfaceVariant.copy(alpha = 0.3f),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -430,9 +428,6 @@ private fun AIChatHistoryRow(
         }
     }
 }
-
-private val GeminiBlue = Color(0xFF000000.toInt() or 0x9DCAFA)
-private val GeminiCanvas = Color(0xFFFCFCFC)
 
 private data class ChatLightSpot(
     val centerX: Float,
@@ -473,7 +468,8 @@ private fun ChatBackground(
 ) {
     val glowVisibility = if (messagesEmpty || glowAlpha > 0f) glowAlpha.coerceIn(0f, 1f) else 0f
     val lightSpots = remember(lightPhase) { geminiChatLightSpots(lightPhase) }
-    val backgroundColor = if (isDarkMode) colors.surface else GeminiCanvas
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     Box(
         modifier = Modifier
@@ -485,9 +481,9 @@ private fun ChatBackground(
                     colorStops = arrayOf(
                         0.00f to Color.Transparent,
                         0.56f to Color.Transparent,
-                        0.68f to GeminiBlue.copy(alpha = 0.08f),
-                        0.82f to GeminiBlue.copy(alpha = 0.24f),
-                        1.00f to GeminiBlue.copy(alpha = 0.54f)
+                        0.68f to primaryColor.copy(alpha = 0.03f),
+                        0.82f to primaryColor.copy(alpha = 0.07f),
+                        1.00f to primaryColor.copy(alpha = 0.12f)
                     ),
                     endY = size.height
                 )
@@ -511,9 +507,9 @@ private fun ChatBackground(
                             drawCircle(
                                 brush = Brush.radialGradient(
                                     colors = listOf(
-                                        GeminiBlue.copy(alpha = spot.alpha * 0.42f),
-                                        GeminiBlue.copy(alpha = spot.alpha * 0.22f),
-                                        GeminiBlue.copy(alpha = spot.alpha * 0.08f),
+                                        primaryColor.copy(alpha = (spot.alpha * 0.12f).coerceAtMost(0.12f)),
+                                        primaryColor.copy(alpha = (spot.alpha * 0.06f).coerceAtMost(0.06f)),
+                                        primaryColor.copy(alpha = (spot.alpha * 0.02f).coerceAtMost(0.02f)),
                                         Color.Transparent
                                     ),
                                     center = center,
@@ -632,9 +628,9 @@ private fun ChatMessageBubble(
         }
 
         Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = if (isUser) colors.primaryContainer else colors.surfaceVariant,
-            tonalElevation = 1.dp,
+            shape = RoundedCornerShape(12.dp),
+            color = if (isUser) colors.primaryContainer else colors.surfaceVariant.copy(alpha = 0.5f),
+            tonalElevation = 0.dp,
             modifier = Modifier.widthIn(max = 300.dp)
         ) {
             Column {
@@ -706,9 +702,9 @@ private fun ChatLoadingIndicator(colors: com.haoze.keynote.ui.theme.AppColors) {
         Avatar(painterResource(R.drawable.ic_psychology_outlined), colors.primaryContainer, colors.primary)
         Spacer(modifier = Modifier.width(6.dp))
         Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = colors.surfaceVariant,
-            tonalElevation = 1.dp
+            shape = RoundedCornerShape(12.dp),
+            color = colors.surfaceVariant.copy(alpha = 0.5f),
+            tonalElevation = 0.dp
         ) {
             Row(
                 modifier = Modifier.padding(12.dp),
@@ -749,11 +745,11 @@ private fun ChatInputBar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp)
-            .shadow(8.dp, MaterialTheme.shapes.extraLarge, ambientColor = colors.shadow, spotColor = colors.shadow)
-            .border(1.dp, colors.outlineVariant, MaterialTheme.shapes.extraLarge),
-        shape = MaterialTheme.shapes.extraLarge,
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
         color = colors.surface,
+        shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {
         Row(
@@ -811,7 +807,7 @@ private fun PendingBillDialog(
         title = { Text("确认创建账单") },
         containerColor = colors.surface,
         textContentColor = colors.onSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         text = {
             DialogContent(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

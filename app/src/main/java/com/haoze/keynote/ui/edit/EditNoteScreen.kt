@@ -170,7 +170,7 @@ fun EditNoteScreen(
             },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 
@@ -273,73 +273,59 @@ private fun EditNoteMoreDialog(
     onDelete: () -> Unit
 ) {
     ActionMenuDialog(title = "更多操作", onDismiss = onDismiss) {
-                // 编辑操作组
-                ActionRow(
-                    icon = painterResource(R.drawable.ic_save),
-                    label = "保存",
-                    onClick = { onSave(); onDismiss() },
-                    rowHeight = 48.dp,
-                    horizontalPadding = 16.dp
-                )
-                ActionRow(
-                    icon = painterResource(R.drawable.ic_undo),
-                    label = "撤回",
-                    onClick = { onUndo(); onDismiss() },
-                    enabled = canUndo,
-                    rowHeight = 48.dp,
-                    horizontalPadding = 16.dp
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
-                // 分享操作组
-                ActionRow(
-                    icon = painterResource(R.drawable.ic_share),
-                    label = "分享",
-                    onClick = { onShare(); onDismiss() },
-                    rowHeight = 48.dp,
-                    horizontalPadding = 16.dp
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
-                // AI功能组
-                ActionRow(
-                    icon = painterResource(R.drawable.ic_auto_awesome),
-                    label = "AI摘要",
-                    onClick = { onSummarize(); onDismiss() },
-                    enabled = !isSummarizing && !isPreview,
-                    isLoading = isSummarizing,
-                    loadingLabel = "摘要生成中...",
-                    rowHeight = 48.dp,
-                    horizontalPadding = 16.dp
-                )
-                ActionRow(
-                    icon = painterResource(R.drawable.ic_label),
-                    label = "AI标签",
-                    onClick = { onGenerateTags(); onDismiss() },
-                    enabled = !isGenerating && !isPreview,
-                    isLoading = isGenerating,
-                    loadingLabel = "标签生成中...",
-                    rowHeight = 48.dp,
-                    horizontalPadding = 16.dp
-                )
-                ActionRow(
-                    icon = painterResource(R.drawable.ic_auto_awesome),
-                    label = "AI润色",
-                    onClick = { onPolish(); onDismiss() },
-                    enabled = !isPolishing && !isPreview,
-                    isLoading = isPolishing,
-                    loadingLabel = "润色中...",
-                    rowHeight = 48.dp,
-                    horizontalPadding = 16.dp
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
-                // 危险操作组
-                ActionRow(
-                    icon = painterResource(R.drawable.ic_delete),
-                    label = "删除",
-                    onClick = { onDelete(); onDismiss() },
-                    isDestructive = true,
-                    rowHeight = 48.dp,
-                    horizontalPadding = 16.dp
-                )
+        // 编辑操作组
+        ActionRow(
+            icon = painterResource(R.drawable.ic_save),
+            label = "保存",
+            onClick = { onSave(); onDismiss() }
+        )
+        ActionRow(
+            icon = painterResource(R.drawable.ic_undo),
+            label = "撤回",
+            onClick = { onUndo(); onDismiss() },
+            enabled = canUndo
+        )
+        HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
+        // 分享操作组
+        ActionRow(
+            icon = painterResource(R.drawable.ic_share),
+            label = "分享",
+            onClick = { onShare(); onDismiss() }
+        )
+        HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
+        // AI功能组
+        ActionRow(
+            icon = painterResource(R.drawable.ic_auto_awesome),
+            label = "AI摘要",
+            onClick = { onSummarize(); onDismiss() },
+            enabled = !isSummarizing && !isPreview,
+            isLoading = isSummarizing,
+            loadingLabel = "摘要生成中..."
+        )
+        ActionRow(
+            icon = painterResource(R.drawable.ic_label),
+            label = "AI标签",
+            onClick = { onGenerateTags(); onDismiss() },
+            enabled = !isGenerating && !isPreview,
+            isLoading = isGenerating,
+            loadingLabel = "标签生成中..."
+        )
+        ActionRow(
+            icon = painterResource(R.drawable.ic_auto_awesome),
+            label = "AI润色",
+            onClick = { onPolish(); onDismiss() },
+            enabled = !isPolishing && !isPreview,
+            isLoading = isPolishing,
+            loadingLabel = "润色中..."
+        )
+        HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
+        // 危险操作组
+        ActionRow(
+            icon = painterResource(R.drawable.ic_delete),
+            label = "删除",
+            onClick = { onDelete(); onDismiss() },
+            isDestructive = true
+        )
     }
 }
 
@@ -373,7 +359,7 @@ private fun EditNotePreviewContent(
         MarkdownPreview(content = content, modifier = Modifier.weight(1f).fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
         if (tags.isNotEmpty()) {
-            Text("标签", style = MaterialTheme.typography.labelMedium, color = colors.outline)
+            Text("标签", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
             TagChipRow(tags = tags, onRemoveTag = {}, showRemove = false)
         }
     }
@@ -454,7 +440,7 @@ private fun EditNoteEditContent(
         }
 
         Spacer(modifier = Modifier.height(12.dp))
-        Text("标签", style = MaterialTheme.typography.labelMedium, color = colors.outline)
+        Text("标签", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
         TagChipRow(tags = tags, onRemoveTag = onRemoveTag)
 
         var newTag by remember { mutableStateOf("") }
@@ -502,6 +488,7 @@ private fun SummaryCard(
             },
             onLongClick = { showEditDialog = true }
         ),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = colors.primaryContainer)
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {
@@ -528,7 +515,7 @@ private fun SummaryCard(
             dismissButton = { TextButton(onClick = { showEditDialog = false }) { Text("取消") } },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 }
@@ -554,6 +541,6 @@ private fun PolishedTextDialog(
         dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
     )
 }

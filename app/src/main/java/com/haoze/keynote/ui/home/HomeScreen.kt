@@ -20,6 +20,7 @@ import com.haoze.keynote.ui.common.NoteAddTagDialog
 import com.haoze.keynote.ui.common.NoteManageTagsDialog
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.painterResource
@@ -49,20 +50,10 @@ fun HomeScreen(
 
     val context = LocalContext.current
 
-    Scaffold(
+    DrawerScaffold(
+        title = "KeyNote",
+        onMenuClick = { scope.launch { drawerState.open() } },
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        topBar = {
-            TopAppBar(
-                title = { Text("KeyNote") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        },
         floatingActionButton = {
             Box(modifier = Modifier.padding(bottom = 16.dp)) {
                 FloatingActionButton(
@@ -100,8 +91,8 @@ fun HomeScreen(
                     ) {
                         Text(
                             "暂无笔记，点击右下角 + 新建",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = colors.outline
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colors.onSurfaceVariant
                         )
                     }
                 }

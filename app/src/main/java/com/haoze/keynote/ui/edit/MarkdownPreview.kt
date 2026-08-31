@@ -13,6 +13,8 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.SpacingTokens
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+
 @Composable
 fun MarkdownPreview(
     content: String,
@@ -23,9 +25,9 @@ fun MarkdownPreview(
         Text(
             "暂无内容",
             style = MaterialTheme.typography.bodyLarge,
-            color = colors.outline,
+            color = colors.onSurfaceVariant,
             modifier = modifier
-                .border(SpacingTokens.borderWidth, colors.outline, MaterialTheme.shapes.small)
+                .border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
                 .padding(SpacingTokens.screenPadding)
         )
         return
@@ -35,7 +37,7 @@ fun MarkdownPreview(
 
     Column(
         modifier = modifier
-            .border(SpacingTokens.borderWidth, colors.outline, MaterialTheme.shapes.small)
+            .border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
             .padding(SpacingTokens.screenPadding)
             .verticalScroll(scrollState)
     ) {

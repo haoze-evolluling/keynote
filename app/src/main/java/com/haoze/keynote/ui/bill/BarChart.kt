@@ -28,14 +28,14 @@ fun BarChart(
     val colors = LocalAppColors.current
     if (data.isEmpty()) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            Text("暂无数据", color = colors.outline)
+            Text("暂无数据", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
         return
     }
 
     val maxVal = data.maxOf { it.total }.coerceAtLeast(1.0)
     val gridColor = colors.outlineVariant
-    val textColor = colors.outline
+    val textColor = colors.onSurfaceVariant
     val barColor = colors.primary
 
     val barWidthDp = SpacingTokens.chartBarWidth

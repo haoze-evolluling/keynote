@@ -59,7 +59,7 @@ fun NoteDeleteConfirmDialog(
             },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 }
@@ -103,7 +103,7 @@ fun NoteDetailsDialog(
             },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 }
@@ -143,7 +143,7 @@ fun NoteAddTagDialog(
             },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = MaterialTheme.colorScheme.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 }
@@ -189,7 +189,7 @@ fun NoteManageTagsDialog(
             },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
         )
     }
 }

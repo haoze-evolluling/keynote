@@ -1,7 +1,6 @@
 package com.haoze.keynote.ui.bill
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.AaSplitEntity
+import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,31 +45,21 @@ fun AaSplitScreen(
     var showDetailDialog by remember { mutableStateOf<AaSplitEntity?>(null) }
     var showDeleteConfirm by remember { mutableStateOf<AaSplitEntity?>(null) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("AA计算") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        },
+    DrawerScaffold(
+        title = "AA计算",
+        onMenuClick = { scope.launch { drawerState.open() } },
         floatingActionButton = {
-            Box(modifier = Modifier.padding(bottom = 64.dp)) {
-                FloatingActionButton(
-                    onClick = { showCreateDialog = true },
-                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
-                ) { Icon(painterResource(R.drawable.ic_add), contentDescription = "新建AA计算") }
-            }
+            FloatingActionButton(
+                onClick = { showCreateDialog = true },
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
+            ) { Icon(painterResource(R.drawable.ic_add), contentDescription = "新建AA计算") }
         }
     ) { innerPadding ->
         if (aaSplits.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 contentAlignment = Alignment.Center
-            ) { Text("暂无AA计算记录", style = MaterialTheme.typography.bodyLarge, color = colors.outline) }
+            ) { Text("暂无AA计算记录", style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant) }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
@@ -107,19 +97,19 @@ fun AaSplitScreen(
             title = { Text(aaSplit.title) },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = {
                 DialogContent(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("总金额", style = ModalTokens.labelTextStyle, color = colors.outline)
+                    Text("总金额", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                     Text("¥${String.format("%.2f", aaSplit.totalAmount)}", style = ModalTokens.bodyTextStyle, fontWeight = FontWeight.Bold)
-                    Text("参与人数", style = ModalTokens.labelTextStyle, color = colors.outline)
+                    Text("参与人数", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                     Text("${aaSplit.personCount}人", style = ModalTokens.bodyTextStyle)
-                    Text("人均费用", style = ModalTokens.labelTextStyle, color = colors.outline)
+                    Text("人均费用", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                     Text("¥${String.format("%.2f", aaSplit.perPersonAmount)}", style = ModalTokens.bodyTextStyle, fontWeight = FontWeight.Bold, color = colors.primary)
-                    Text("时间", style = ModalTokens.labelTextStyle, color = colors.outline)
+                    Text("时间", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                     Text(dateFormat.format(Date(aaSplit.date)), style = ModalTokens.bodyTextStyle)
                     if (!aaSplit.note.isNullOrBlank()) {
-                        Text("备注", style = ModalTokens.labelTextStyle, color = colors.outline)
+                        Text("备注", style = ModalTokens.labelTextStyle, color = colors.onSurfaceVariant)
                         Text(aaSplit.note, style = ModalTokens.bodyTextStyle)
                     }
                 }
@@ -142,7 +132,7 @@ fun AaSplitScreen(
             title = { Text("删除记录") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = { Text("确定要删除这条AA计算记录吗？") },
             confirmButton = {
                 TextButton(
@@ -166,10 +156,11 @@ private fun AaSplitCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, colors.outlineVariant, MaterialTheme.shapes.medium)
             .combinedClickable(onClick = onClick),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -205,7 +196,7 @@ private fun AaSplitCard(
                 Text(
                     dateFormat.format(Date(aaSplit.date)),
                     style = MaterialTheme.typography.bodySmall,
-                    color = colors.outline
+                    color = colors.onSurfaceVariant
                 )
             }
         }
@@ -238,7 +229,7 @@ private fun AaSplitCreateDialog(
         title = { Text("新建AA计算") },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         text = {
             DialogContent(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(

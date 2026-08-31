@@ -24,8 +24,7 @@ import com.haoze.keynote.ui.common.NoteDeleteConfirmDialog
 import com.haoze.keynote.ui.common.NoteDetailsDialog
 import com.haoze.keynote.ui.common.NoteAddTagDialog
 import com.haoze.keynote.ui.common.NoteManageTagsDialog
-import androidx.compose.ui.res.painterResource
-import com.haoze.keynote.R
+import com.haoze.keynote.ui.components.DrawerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,24 +53,16 @@ fun TagNotesScreen(
         allNotes.filter { noteWithTags -> noteWithTags.tags.any { it.id == tagId } }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("#$tagName") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        }
+    DrawerScaffold(
+        title = "#$tagName",
+        onMenuClick = { scope.launch { drawerState.open() } }
     ) { innerPadding ->
         if (filteredNotes.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("该标签下暂无笔记", style = MaterialTheme.typography.bodyLarge, color = colors.outline)
+                Text("该标签下暂无笔记", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
             }
         } else {
             LazyColumn(

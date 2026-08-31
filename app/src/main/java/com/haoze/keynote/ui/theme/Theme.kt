@@ -103,21 +103,21 @@ data class AppColors(
 val LocalAppColors = staticCompositionLocalOf<AppColors> { error("No AppColors provided") }
 
 private val FallbackLightScheme = lightColorScheme(
-    primary = Color(0xFF1769AA), onPrimary = Color.White, primaryContainer = Color(0xFFD2E4FF), onPrimaryContainer = Color(0xFF001D36),
-    secondary = Color(0xFF535F70), onSecondary = Color.White, secondaryContainer = Color(0xFFD7E3F7), onSecondaryContainer = Color(0xFF101C2B),
-    tertiary = Color(0xFF6C5B00), onTertiary = Color.White, tertiaryContainer = Color(0xFFFFE978), onTertiaryContainer = Color(0xFF211B00),
-    background = Color(0xFFF9F9FC), onBackground = Color(0xFF1A1C1E), surface = Color(0xFFF9F9FC), onSurface = Color(0xFF1A1C1E),
-    surfaceVariant = Color(0xFFDEE3EB), onSurfaceVariant = Color(0xFF42474E), outline = Color(0xFF72777F), outlineVariant = Color(0xFFC2C7CF),
-    surfaceContainerLowest = Color(0xFFFFFFFF), surfaceContainerLow = Color(0xFFF3F4F7), surfaceContainer = Color(0xFFEEEFF3), surfaceContainerHigh = Color(0xFFE8EAF0), surfaceContainerHighest = Color(0xFFE2E5EA)
+    primary = Color(0xFF6650A4), onPrimary = Color(0xFFFFFFFF), primaryContainer = Color(0xFFEADDFF), onPrimaryContainer = Color(0xFF21005D),
+    secondary = Color(0xFF625B71), onSecondary = Color(0xFFFFFFFF), secondaryContainer = Color(0xFFE8DEF8), onSecondaryContainer = Color(0xFF1D192B),
+    tertiary = Color(0xFF7D5260), onTertiary = Color(0xFFFFFFFF), tertiaryContainer = Color(0xFFFFD8E4), onTertiaryContainer = Color(0xFF31111D),
+    background = Color(0xFFFFFBFE), onBackground = Color(0xFF1C1B1F), surface = Color(0xFFFFFBFE), onSurface = Color(0xFF1C1B1F),
+    surfaceVariant = Color(0xFFE7E0EC), onSurfaceVariant = Color(0xFF49454F), outline = Color(0xFF79747E), outlineVariant = Color(0xFFCAC4D0),
+    surfaceContainerLowest = Color(0xFFFFFFFF), surfaceContainerLow = Color(0xFFF7F2FA), surfaceContainer = Color(0xFFF3EDF7), surfaceContainerHigh = Color(0xFFECE6F0), surfaceContainerHighest = Color(0xFFE6E0E9)
 )
 
 private val FallbackDarkScheme = darkColorScheme(
-    primary = Color(0xFFA6CDFF), onPrimary = Color(0xFF003258), primaryContainer = Color(0xFF004A79), onPrimaryContainer = Color(0xFFD2E4FF),
-    secondary = Color(0xFFBBC7DB), onSecondary = Color(0xFF253141), secondaryContainer = Color(0xFF3B4758), onSecondaryContainer = Color(0xFFD7E3F7),
-    tertiary = Color(0xFFE8D971), onTertiary = Color(0xFF363000), tertiaryContainer = Color(0xFF504900), onTertiaryContainer = Color(0xFFFFE978),
-    background = Color(0xFF1A1B1F), onBackground = Color(0xFFE3E2E6), surface = Color(0xFF1A1B1F), onSurface = Color(0xFFE3E2E6),
-    surfaceVariant = Color(0xFF41474F), onSurfaceVariant = Color(0xFFC2C7CF), outline = Color(0xFF8C9199), outlineVariant = Color(0xFF41474F),
-    surfaceContainerLowest = Color(0xFF121316), surfaceContainerLow = Color(0xFF1E1F23), surfaceContainer = Color(0xFF222328), surfaceContainerHigh = Color(0xFF2C2D32), surfaceContainerHighest = Color(0xFF37383E)
+    primary = Color(0xFFD0BCFF), onPrimary = Color(0xFF381E72), primaryContainer = Color(0xFF4F378B), onPrimaryContainer = Color(0xFFEADDFF),
+    secondary = Color(0xFFCCC2DC), onSecondary = Color(0xFF332D41), secondaryContainer = Color(0xFF4A4458), onSecondaryContainer = Color(0xFFE8DEF8),
+    tertiary = Color(0xFFEFB8C8), onTertiary = Color(0xFF492532), tertiaryContainer = Color(0xFF633B48), onTertiaryContainer = Color(0xFFFFD8E4),
+    background = Color(0xFF1C1B1F), onBackground = Color(0xFFE6E1E5), surface = Color(0xFF1C1B1F), onSurface = Color(0xFFE6E1E5),
+    surfaceVariant = Color(0xFF49454F), onSurfaceVariant = Color(0xFFCAC4D0), outline = Color(0xFF938F99), outlineVariant = Color(0xFF49454F),
+    surfaceContainerLowest = Color(0xFF0F0D13), surfaceContainerLow = Color(0xFF1C1B1F), surfaceContainer = Color(0xFF201F23), surfaceContainerHigh = Color(0xFF2B2930), surfaceContainerHighest = Color(0xFF36343B)
 )
 
 fun ColorScheme.toAppColors(darkTheme: Boolean) = AppColors(
@@ -125,7 +125,7 @@ fun ColorScheme.toAppColors(darkTheme: Boolean) = AppColors(
     surface, onSurface, surfaceVariant, onSurfaceVariant, error, onError, errorContainer, onErrorContainer, tertiary, onTertiary,
     tertiaryContainer, onTertiaryContainer, outline, outlineVariant, background, onBackground, Color.Transparent,
     Color.Black.copy(alpha = if (darkTheme) 0.45f else 0.12f), surfaceContainerHigh, Color.Unspecified,
-    chartColors = listOf(primary, tertiary, secondary, primaryContainer, onSurfaceVariant),
+    chartColors = listOf(primary, tertiary, secondary, error, primaryContainer, tertiaryContainer, secondaryContainer, outline, outlineVariant, surfaceVariant),
     priorityLow = if (darkTheme) Color(0xFF81C995) else Color(0xFF2E7D32),
     priorityMedium = if (darkTheme) Color(0xFFFFB74D) else Color(0xFFB06000),
     priorityHigh = if (darkTheme) Color(0xFFFF8A80) else Color(0xFFBA1A1A),
@@ -194,10 +194,10 @@ fun DialogContent(
 
 private val AppShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
-    small = RoundedCornerShape(8.dp),
-    medium = RoundedCornerShape(10.dp),
-    large = RoundedCornerShape(14.dp),
-    extraLarge = RoundedCornerShape(20.dp)
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(16.dp),
+    extraLarge = RoundedCornerShape(28.dp)
 )
 
 // ─── Theme Composable ─────────────────────────────────────────────────────────

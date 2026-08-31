@@ -25,8 +25,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -34,14 +34,11 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,8 +54,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.HabitEntity
+import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.LocalAppColors
@@ -91,25 +90,15 @@ fun HabitScreen(
 
     var habitToDelete by remember { mutableStateOf<HabitEntity?>(null) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("习惯打卡") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        },
+    DrawerScaffold(
+        title = "习惯打卡",
+        onMenuClick = { scope.launch { drawerState.open() } },
         floatingActionButton = {
-            Box(modifier = Modifier.padding(bottom = 64.dp)) {
-                FloatingActionButton(
-                    onClick = { viewModel.openCreateEditor() },
-                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
-                ) {
-                    Icon(painterResource(R.drawable.ic_add), contentDescription = "添加习惯")
-                }
+            FloatingActionButton(
+                onClick = { viewModel.openCreateEditor() },
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
+            ) {
+                Icon(painterResource(R.drawable.ic_add), contentDescription = "添加习惯")
             }
         },
         containerColor = colors.background
@@ -127,7 +116,7 @@ fun HabitScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .padding(horizontal = SpacingTokens.screenPadding),
-                contentPadding = PaddingValues(bottom = 112.dp),
+                contentPadding = PaddingValues(bottom = 96.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {
@@ -163,7 +152,7 @@ fun HabitScreen(
             title = { Text("删除习惯") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = { Text("确定要删除「${habit.title}」吗？删除后可在回收站中恢复。") },
             confirmButton = {
                 TextButton(onClick = {
@@ -193,14 +182,21 @@ private fun HabitEmptyState(
                 tint = colors.primary
             )
             Spacer(Modifier.height(12.dp))
-            Text("还没有习惯", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "还没有习惯",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.onSurface
+            )
             Text(
                 "从一个每天都想坚持的小动作开始",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = colors.onSurfaceVariant
             )
             Spacer(Modifier.height(12.dp))
-            TextButton(onClick = onCreate) { Text("创建第一个习惯") }
+            TextButton(
+                onClick = onCreate,
+                shape = RoundedCornerShape(12.dp)
+            ) { Text("创建第一个习惯") }
         }
     }
 }
@@ -231,14 +227,25 @@ private fun HabitStatCard(
 ) {
     val colors = LocalAppColors.current
     Surface(
-        modifier = modifier.border(1.dp, colors.outlineVariant, MaterialTheme.shapes.medium),
-        shape = MaterialTheme.shapes.medium,
+        modifier = modifier.border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
         color = colors.surface,
+        shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
             Text(label, style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
-            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                value,
+                // 三卡并排空间有限，按规范以 22sp ExtraBold 靠拢 28sp 数值层级
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            )
         }
     }
 }
@@ -254,13 +261,14 @@ private fun HabitCard(
     val accent = Color(item.habit.color)
     val todayStart = remember { System.currentTimeMillis().toDayStartMillis() }
 
-    OutlinedCard(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onToggle),
-        border = BorderStroke(1.dp, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -350,7 +358,7 @@ private fun HabitEditorDialog(
         title = { Text(if (habit == null) "新建习惯" else "编辑习惯") },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         text = {
             Column(
                 modifier = Modifier

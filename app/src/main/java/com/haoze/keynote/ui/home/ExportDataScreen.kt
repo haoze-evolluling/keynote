@@ -1,7 +1,9 @@
 package com.haoze.keynote.ui.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -264,8 +266,9 @@ private fun AiProviderExportSheet(
 
             if (showWarning) {
                 Surface(
-                    color = LocalAppColors.current.errorContainer,
-                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.12f),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.35f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -289,7 +292,7 @@ private fun AiProviderExportSheet(
             }
 
             if (providers.isEmpty()) {
-                Text("暂未配置任何 AI 厂商", style = MaterialTheme.typography.bodyMedium, color = LocalAppColors.current.outline)
+                Text("暂未配置任何 AI 厂商", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 Text("选择要导出的厂商", style = ModalTokens.titleTextStyle)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -316,6 +319,7 @@ private fun AiProviderExportSheet(
             Button(
                 onClick = { onExport(selectedProviderIds) },
                 modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
                 enabled = providers.isNotEmpty() && selectedProviderIds.isNotEmpty()
             ) {
                 Text("确认导出")
@@ -341,7 +345,7 @@ private fun ExportSheet(
         ) {
             Text(title, style = ModalTokens.titleTextStyle)
             filterContent()
-            Button(onClick = onConfirm, modifier = Modifier.fillMaxWidth()) { Text(confirmLabel) }
+            Button(onClick = onConfirm, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) { Text(confirmLabel) }
         }
     }
 }

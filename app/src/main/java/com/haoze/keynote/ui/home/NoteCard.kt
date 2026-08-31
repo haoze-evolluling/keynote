@@ -3,7 +3,7 @@ package com.haoze.keynote.ui.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -29,7 +29,7 @@ fun NoteCard(
     val note = noteWithTags.note
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
 
-    OutlinedCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = SpacingTokens.screenPadding, vertical = SpacingTokens.tinySpacing)
@@ -37,11 +37,15 @@ fun NoteCard(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        border = BorderStroke(SpacingTokens.borderWidth, colors.outlineVariant),
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        elevation = CardDefaults.cardElevation(defaultElevation = SpacingTokens.cardElevation)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
     ) {
-        Column(modifier = Modifier.padding(SpacingTokens.screenPadding)) {
+        Column(
+            modifier = Modifier.padding(SpacingTokens.contentSpacing),
+            verticalArrangement = Arrangement.spacedBy(SpacingTokens.contentSpacing)
+        ) {
             Text(
                 text = note.title.ifBlank { "无标题" },
                 style = MaterialTheme.typography.titleMedium,
@@ -54,22 +58,17 @@ fun NoteCard(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = colors.onSurfaceVariant
                     ),
-                    maxLines = 3,
-                    modifier = Modifier.padding(top = SpacingTokens.tinySpacing)
+                    maxLines = 3
                 )
             }
-            Row(
-                modifier = Modifier.padding(top = SpacingTokens.smallSpacing),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Row {
                 Text(
                     text = dateFormat.format(Date(note.createdAt)),
                     style = MaterialTheme.typography.labelSmall,
-                    color = colors.outline
+                    color = colors.onSurfaceVariant
                 )
             }
             if (noteWithTags.tags.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(SpacingTokens.smallSpacing))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     noteWithTags.tags.forEach { tag ->
                         SuggestionChip(

@@ -30,8 +30,8 @@ fun ActionRow(
     isLoading: Boolean = false,
     loadingLabel: String = "",
     enabled: Boolean = true,
-    rowHeight: Dp = SpacingTokens.actionRowHeight,
-    horizontalPadding: Dp = SpacingTokens.tinySpacing
+    rowHeight: Dp = 48.dp,
+    horizontalPadding: Dp = 16.dp
 ) {
     val colors = LocalAppColors.current
     val tint = when {

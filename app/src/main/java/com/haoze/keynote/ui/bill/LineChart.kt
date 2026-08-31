@@ -42,15 +42,15 @@ fun LineChart(
 ) {
     val colors = LocalAppColors.current
     if (data.isEmpty()) {
-        Box(modifier = modifier) {
-            Text("暂无数据", color = colors.outline)
+        Box(modifier = modifier, contentAlignment = androidx.compose.ui.Alignment.Center) {
+            Text("暂无数据", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
         return
     }
 
     val lineColor = colors.primary
     val gridColor = colors.outlineVariant
-    val textColor = colors.outline
+    val textColor = colors.onSurfaceVariant
     val surfaceColor = colors.surface
 
     val paddingLeftDp = SpacingTokens.chartPaddingLeft

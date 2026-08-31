@@ -37,7 +37,7 @@ fun TagEditBottomSheet(
             Text(
                 "当前标签",
                 style = ModalTokens.labelTextStyle,
-                color = colors.outline
+                color = colors.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(

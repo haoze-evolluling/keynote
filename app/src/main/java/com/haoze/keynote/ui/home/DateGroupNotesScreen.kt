@@ -23,8 +23,7 @@ import com.haoze.keynote.ui.common.NoteAddTagDialog
 import com.haoze.keynote.ui.common.NoteManageTagsDialog
 import com.haoze.keynote.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.ui.res.painterResource
-import com.haoze.keynote.R
+import com.haoze.keynote.ui.components.DrawerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,24 +56,16 @@ fun DateGroupNotesScreen(
         }.toSortedMap(Comparator.reverseOrder())
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("按日期查看") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        }
+    DrawerScaffold(
+        title = "按日期查看",
+        onMenuClick = { scope.launch { drawerState.open() } }
     ) { innerPadding ->
         if (notes.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("暂无笔记", style = MaterialTheme.typography.bodyLarge, color = colors.outline)
+                Text("暂无笔记", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
             }
         } else {
             LazyColumn(

@@ -124,7 +124,7 @@ fun AiProviderManageScreen(
                     Text("取消")
                 }
             },
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(28.dp)
         )
     }
 
@@ -230,7 +230,7 @@ private fun ProviderEditDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (isNewMode) "添加自定义厂商" else "编辑厂商") },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         text = {
             DialogContent(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -234,8 +235,8 @@ private fun DrawerHeader() {
             )
             Text(
                 "个人管理工具",
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.outline
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant
             )
         }
     }
@@ -273,7 +274,7 @@ private fun DrawerGroupRow(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 2.dp)
             .fillMaxWidth()
-            .height(44.dp)
+            .heightIn(min = 44.dp)
             .background(
                 color = backgroundColor,
                 shape = MaterialTheme.shapes.medium
@@ -318,7 +319,7 @@ private fun DrawerNavRow(
 ) {
     val colors = LocalAppColors.current
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) colors.primary else colors.onSurfaceVariant,
+        targetValue = if (isSelected) colors.primary else colors.onSurface,
         animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing),
         label = "drawerNavContentColor"
     )
@@ -333,7 +334,7 @@ private fun DrawerNavRow(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 2.dp)
             .fillMaxWidth()
-            .height(44.dp)
+            .heightIn(min = 44.dp)
             .background(
                 color = backgroundColor,
                 shape = MaterialTheme.shapes.medium
@@ -369,7 +370,7 @@ private fun DrawerTagsSection(
 ) {
     val colors = LocalAppColors.current
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) colors.primary else colors.onSurfaceVariant,
+        targetValue = if (isSelected) colors.primary else colors.onSurface,
         animationSpec = tween(MotionTokens.DurationShort, easing = MotionTokens.StandardEasing),
         label = "drawerTagsContentColor"
     )
@@ -389,7 +390,7 @@ private fun DrawerTagsSection(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 2.dp)
             .fillMaxWidth()
-            .height(44.dp)
+            .heightIn(min = 44.dp)
             .background(
                 color = backgroundColor,
                 shape = MaterialTheme.shapes.medium
@@ -428,16 +429,20 @@ private fun DrawerTagsSection(
                 Text(
                     "暂无标签",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = colors.outline,
+                    color = colors.onSurfaceVariant,
                     modifier = Modifier.padding(start = 68.dp, end = 16.dp, top = 8.dp, bottom = 10.dp)
                 )
             } else {
                 tags.forEach { tag ->
                     Row(
                         modifier = Modifier
-                            .padding(horizontal = 8.dp)
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
                             .fillMaxWidth()
-                            .height(36.dp)
+                            .heightIn(min = 44.dp)
+                            .background(
+                                color = colors.transparent,
+                                shape = MaterialTheme.shapes.medium
+                            )
                             .clickable { onTagClick(tag) }
                             .padding(start = 68.dp, end = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -445,7 +450,7 @@ private fun DrawerTagsSection(
                         Text(
                             "#${tag.name}",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = colors.onSurfaceVariant,
+                            color = colors.onSurface,
                             modifier = Modifier.weight(1f)
                         )
                     }

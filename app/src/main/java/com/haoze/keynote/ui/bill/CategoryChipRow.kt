@@ -24,7 +24,7 @@ fun CategoryChipRow(
         Text(
             "类别",
             style = MaterialTheme.typography.labelMedium,
-            color = colors.outline
+            color = colors.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(4.dp))
         FlowRow(
@@ -37,13 +37,15 @@ fun CategoryChipRow(
                     onClick = {
                         onSelectCategory(if (selectedCategoryId == category.id) null else category.id)
                     },
-                    label = { Text(category.name) }
+                    label = { Text(category.name) },
+                    shape = RoundedCornerShape(12.dp)
                 )
             }
             FilterChip(
                 selected = false,
                 onClick = { showAddDialog = true },
-                label = { Text("+") }
+                label = { Text("+") },
+                shape = RoundedCornerShape(12.dp)
             )
         }
     }
@@ -55,7 +57,7 @@ fun CategoryChipRow(
             title = { Text("新建类别") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = {
                 OutlinedTextField(
                     value = newName,

@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
@@ -27,23 +26,12 @@ fun DonutChart(
     val total = data.sumOf { it.total }
     if (total <= 0.0 || data.isEmpty()) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            Text("暂无数据", color = colors.outline)
+            Text("暂无数据", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
         }
         return
     }
 
-    val chartColors = listOf(
-        colors.primary,
-        colors.secondary,
-        colors.tertiary,
-        colors.error,
-        colors.primaryContainer,
-        colors.secondaryContainer,
-        colors.tertiaryContainer,
-        colors.errorContainer,
-        colors.outline,
-        colors.outlineVariant,
-    )
+    val chartColors = colors.chartColors
 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -84,7 +72,7 @@ fun DonutChart(
                 Text(
                     "总计",
                     style = MaterialTheme.typography.bodySmall,
-                    color = colors.outline
+                    color = colors.onSurfaceVariant
                 )
             }
         }
@@ -106,18 +94,18 @@ fun DonutChart(
                 Spacer(modifier = Modifier.width(SpacingTokens.smallSpacing))
                 Text(
                     item.categoryName ?: "未分类",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     "¥${String.format("%.2f", item.total)}",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "${String.format("%.1f", percent)}%",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelSmall,
                     color = colors.outline
                 )
             }

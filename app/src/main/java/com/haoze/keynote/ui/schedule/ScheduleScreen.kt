@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,6 +33,7 @@ import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.common.ActionMenuDialog
+import com.haoze.keynote.ui.components.DrawerScaffold
 import androidx.compose.ui.res.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.R
@@ -83,25 +83,15 @@ fun ScheduleScreen(
         }.toSortedMap(Comparator.reverseOrder())
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("日程") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                    }
-                }
-            )
-        },
+    DrawerScaffold(
+        title = "日程",
+        onMenuClick = { scope.launch { drawerState.open() } },
         floatingActionButton = {
-            Box(modifier = Modifier.padding(bottom = 64.dp)) {
-                FloatingActionButton(
-                    onClick = { showCreateDialog = true },
-                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
-                ) {
-                    Icon(painterResource(R.drawable.ic_add), contentDescription = "新建日程")
-                }
+            FloatingActionButton(
+                onClick = { showCreateDialog = true },
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 0.dp)
+            ) {
+                Icon(painterResource(R.drawable.ic_add), contentDescription = "新建日程")
             }
         }
     ) { innerPadding ->
@@ -118,7 +108,7 @@ fun ScheduleScreen(
                         tint = colors.outline
                     )
                     Spacer(Modifier.height(16.dp))
-                    Text("暂无日程", style = MaterialTheme.typography.bodyLarge, color = colors.outline)
+                    Text("暂无日程", style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
                 }
             }
         } else {
@@ -138,14 +128,16 @@ fun ScheduleScreen(
                     }
                     items(monthSchedules, key = { it.id }) { schedule ->
                         val linkedNote = notes.find { it.note.id == schedule.noteId }
-                        OutlinedCard(
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
                                 .animateItem()
                                 .combinedClickable(onClick = {}, onLongClick = { showActionDialogForSchedule = schedule.id }),
-                            border = BorderStroke(1.dp, colors.outlineVariant),
-                            colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            )
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -184,29 +176,29 @@ fun ScheduleScreen(
                         ActionRow(icon = painterResource(R.drawable.ic_edit), label = "编辑日程", onClick = {
                             showEditDialogForSchedule = currentSchedule
                             showActionDialogForSchedule = null
-                        }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                        })
                         if (hasLink) {
                             ActionRow(icon = painterResource(R.drawable.ic_link_off), label = "取消关联笔记", onClick = {
                                 viewModel.unlinkNote(currentSchedule.id)
                                 showActionDialogForSchedule = null
-                            }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                            })
                         } else {
                             ActionRow(icon = painterResource(R.drawable.ic_link), label = "关联笔记", onClick = {
                                 showLinkNoteDialog = currentSchedule.id
                                 showActionDialogForSchedule = null
-                            }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                            })
                         }
                         HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
                         ActionRow(icon = painterResource(R.drawable.ic_auto_awesome), label = if (isGeneratingNote) "生成中..." else "AI 生成笔记", onClick = {
                             pendingAiScheduleId = currentSchedule.id
                             viewModel.aiGenerateNote(currentSchedule.id)
                             showActionDialogForSchedule = null
-                        }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                        })
                         HorizontalDivider(modifier = Modifier.padding(vertical = ModalTokens.menuDividerPaddingVertical))
                         ActionRow(icon = painterResource(R.drawable.ic_delete), label = "删除日程", isDestructive = true, onClick = {
                             showDeleteConfirm = currentSchedule
                             showActionDialogForSchedule = null
-                        }, rowHeight = 48.dp, horizontalPadding = 16.dp)
+                        })
             }
         }
     }
@@ -217,7 +209,7 @@ fun ScheduleScreen(
             title = { Text("删除日程") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = { Text("确定要删除「${schedule.title}」吗？") },
             confirmButton = {
                 TextButton(onClick = {
@@ -287,7 +279,7 @@ fun ScheduleScreen(
             title = { Text("选择关联笔记") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = {
                 if (notes.isEmpty()) {
                     Text("暂无笔记", color = colors.outline)
@@ -328,7 +320,7 @@ fun ScheduleScreen(
             title = { Text("AI 生成笔记预览") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = {
                 OutlinedTextField(
                     value = editedContent,
@@ -577,14 +569,14 @@ private fun ScheduleDialog(
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         textContentColor = colors.onSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
     )
 
     if (showDatePicker) {
         val datePickerState = rememberDatePickerState(initialSelectedDateMillis = editDate)
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             confirmButton = {
                     TextButton(onClick = {
                         datePickerState.selectedDateMillis?.let {
@@ -612,7 +604,7 @@ private fun ScheduleDialog(
             title = { Text("选择时间") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = { TimePicker(state = timePickerState) },
             confirmButton = {
                 TextButton(onClick = {
@@ -636,7 +628,7 @@ private fun ScheduleDialog(
         val endDatePickerState = rememberDatePickerState(initialSelectedDateMillis = editEndDate ?: System.currentTimeMillis())
         DatePickerDialog(
             onDismissRequest = { showEndDatePicker = false },
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             confirmButton = {
                 TextButton(onClick = {
                     endDatePickerState.selectedDateMillis?.let {
@@ -664,7 +656,7 @@ private fun ScheduleDialog(
             title = { Text("选择结束时间") },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             textContentColor = colors.onSurface,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(28.dp),
             text = { TimePicker(state = endTimePickerState) },
             confirmButton = {
                 TextButton(onClick = {
