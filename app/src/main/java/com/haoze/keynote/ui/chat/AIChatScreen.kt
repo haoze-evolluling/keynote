@@ -2,6 +2,7 @@ package com.haoze.keynote.ui.chat
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -118,118 +119,118 @@ fun AIChatScreen(
         }
     }
     val glowAlpha = glowAlphaAnim.value
-    val glowPhaseAnim = remember { Animatable(0f) }
 
-    LaunchedEffect(messages.isEmpty() && !isDarkMode) {
-        val shouldAnimate = messages.isEmpty() && !isDarkMode
-        while (shouldAnimate) {
-            glowPhaseAnim.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(durationMillis = 6200, easing = LinearEasing)
-            )
-            glowPhaseAnim.snapTo(0f)
-        }
-    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        ChatBackground(
+            messagesEmpty = messages.isEmpty(),
+            glowAlpha = glowAlpha,
+            isDarkMode = isDarkMode
+        )
 
-    Scaffold(
-        containerColor = colors.transparent,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("AI 对话")
-                            Box {
-                                val arrowRotation by animateFloatAsState(
-                                    targetValue = if (assistantMenuExpanded) 180f else 0f,
-                                    animationSpec = tween(200),
-                                    label = "arrowRotation"
-                                )
-                                IconButton(onClick = { assistantMenuExpanded = true }) {
-                                    Icon(
-                                        painterResource(R.drawable.ic_arrow_drop_down),
-                                        contentDescription = "切换助手",
-                                        modifier = Modifier.graphicsLayer { rotationZ = arrowRotation }
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("AI 对话")
+                                Box {
+                                    val arrowRotation by animateFloatAsState(
+                                        targetValue = if (assistantMenuExpanded) 180f else 0f,
+                                        animationSpec = tween(200),
+                                        label = "arrowRotation"
                                     )
+                                    IconButton(onClick = { assistantMenuExpanded = true }) {
+                                        Icon(
+                                            painterResource(R.drawable.ic_arrow_drop_down),
+                                            contentDescription = "切换助手",
+                                            modifier = Modifier.graphicsLayer { rotationZ = arrowRotation }
+                                        )
+                                    }
                                 }
                             }
+                            Text(
+                                text = assistantText.subtitle,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = colors.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
-                        Text(
-                            text = assistantText.subtitle,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = colors.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.surface),
-                navigationIcon = {
-                    // 首页嵌入模式已在主界面，无需菜单按钮
-                    if (!embeddedInHome) {
-                        IconButton(onClick = { openMainNav?.invoke() }) {
-                            Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
-                        }
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { actionsMenuExpanded = true }) {
-                        Icon(painterResource(R.drawable.ic_more_vert), contentDescription = "更多操作")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-            )
-
-            if (assistantMenuExpanded) {
-                ActionMenuDialog(title = "切换助手", onDismiss = { assistantMenuExpanded = false }) {
-                    listOf(AssistantType.CHAT, AssistantType.BILL, AssistantType.PLANNER).forEach { type ->
-                        ActionRow(
-                            icon = painterResource(if (type == currentAssistant) R.drawable.ic_check else R.drawable.ic_auto_awesome),
-                            label = assistantUiText(type).menuLabel,
-                            onClick = {
-                                viewModel.switchAssistant(type)
-                                assistantMenuExpanded = false
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = colors.surface.copy(alpha = 0.85f),
+                        navigationIconContentColor = colors.onSurface,
+                        titleContentColor = colors.onSurface,
+                        actionIconContentColor = colors.onSurface
+                    ),
+                    navigationIcon = {
+                        // 首页嵌入模式已在主界面，无需菜单按钮
+                        if (!embeddedInHome) {
+                            IconButton(onClick = { openMainNav?.invoke() }) {
+                                Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
                             }
-                        )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { actionsMenuExpanded = true }) {
+                            Icon(painterResource(R.drawable.ic_more_vert), contentDescription = "更多操作")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                )
+
+                if (assistantMenuExpanded) {
+                    ActionMenuDialog(title = "切换助手", onDismiss = { assistantMenuExpanded = false }) {
+                        listOf(AssistantType.CHAT, AssistantType.BILL, AssistantType.PLANNER).forEach { type ->
+                            ActionRow(
+                                icon = painterResource(if (type == currentAssistant) R.drawable.ic_check else R.drawable.ic_auto_awesome),
+                                label = assistantUiText(type).menuLabel,
+                                onClick = {
+                                    viewModel.switchAssistant(type)
+                                    assistantMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                if (actionsMenuExpanded) {
+                    ActionMenuDialog(title = "更多操作", onDismiss = { actionsMenuExpanded = false }) {
+                        ActionRow(painterResource(R.drawable.ic_history_outlined), "历史对话", {
+                            actionsMenuExpanded = false
+                            showHistoryDialog = true
+                        })
+                        if (messages.isNotEmpty()) {
+                            ActionRow(painterResource(R.drawable.ic_edit_outlined), "保存对话", {
+                                actionsMenuExpanded = false
+                                isCreatingNote = true
+                                viewModel.createNoteFromMessages()
+                            }, enabled = !isCreatingNote)
+                            ActionRow(painterResource(R.drawable.ic_delete_outlined), "删除对话", {
+                                actionsMenuExpanded = false
+                                showDeleteConversationConfirm = true
+                            }, isDestructive = true)
+                        }
+                        ActionRow(painterResource(R.drawable.ic_refresh_outlined), "重新生成", {
+                            actionsMenuExpanded = false
+                            viewModel.regenerateLastResponse()
+                        }, enabled = !isLoading && messages.any { it.role == "user" })
+                        ActionRow(painterResource(R.drawable.ic_chat_outlined_mirrored), "新对话", {
+                            actionsMenuExpanded = false
+                            if (messages.isEmpty()) viewModel.clearMessages() else showNewConversationConfirm = true
+                        })
                     }
                 }
             }
-
-            if (actionsMenuExpanded) {
-                ActionMenuDialog(title = "更多操作", onDismiss = { actionsMenuExpanded = false }) {
-                    ActionRow(painterResource(R.drawable.ic_history_outlined), "历史对话", {
-                        actionsMenuExpanded = false
-                        showHistoryDialog = true
-                    })
-                    if (messages.isNotEmpty()) {
-                        ActionRow(painterResource(R.drawable.ic_edit_outlined), "保存对话", {
-                            actionsMenuExpanded = false
-                            isCreatingNote = true
-                            viewModel.createNoteFromMessages()
-                        }, enabled = !isCreatingNote)
-                        ActionRow(painterResource(R.drawable.ic_delete_outlined), "删除对话", {
-                            actionsMenuExpanded = false
-                            showDeleteConversationConfirm = true
-                        }, isDestructive = true)
-                    }
-                    ActionRow(painterResource(R.drawable.ic_refresh_outlined), "重新生成", {
-                        actionsMenuExpanded = false
-                        viewModel.regenerateLastResponse()
-                    }, enabled = !isLoading && messages.any { it.role == "user" })
-                    ActionRow(painterResource(R.drawable.ic_chat_outlined_mirrored), "新对话", {
-                        actionsMenuExpanded = false
-                        if (messages.isEmpty()) viewModel.clearMessages() else showNewConversationConfirm = true
-                    })
-                }
-            }
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).clip(MaterialTheme.shapes.extraLarge)
-        ) {
-            ChatBackground(colors, messages.isEmpty(), glowAlpha, isDarkMode, glowPhaseAnim.value)
-
-            Column(modifier = Modifier.fillMaxSize()) {
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
                 Box(modifier = Modifier.weight(1f)) {
                     Crossfade(
                         targetState = currentAssistant,
@@ -444,98 +445,180 @@ private fun AIChatHistoryRow(
     }
 }
 
-private data class ChatLightSpot(
-    val centerX: Float,
-    val centerY: Float,
-    val radiusScale: Float,
-    val alpha: Float
-)
-
-private fun geminiChatLightSpots(phase: Float): List<ChatLightSpot> {
-    val p = phase.coerceIn(0f, 1f)
-    val fullTurn = (kotlin.math.PI * 2).toFloat()
-    fun sine(offset: Float): Float = kotlin.math.sin((p + offset) * fullTurn)
-    fun cosine(offset: Float): Float = kotlin.math.cos((p + offset) * fullTurn)
-    return listOf(
-        ChatLightSpot(
-            centerX = 0.50f + 0.035f * sine(0.00f),
-            centerY = 0.985f + 0.010f * cosine(0.12f),
-            radiusScale = 0.72f,
-            alpha = 0.48f
-        )
-    ).map { spot ->
-        spot.copy(
-            centerX = spot.centerX.coerceIn(0f, 1f),
-            centerY = spot.centerY.coerceIn(0f, 1f),
-            radiusScale = spot.radiusScale.coerceAtLeast(0.01f),
-            alpha = spot.alpha.coerceIn(0f, 1f)
-        )
-    }
-}
-
 @Composable
 private fun ChatBackground(
-    colors: com.haoze.keynote.ui.theme.AppColors,
     messagesEmpty: Boolean,
     glowAlpha: Float,
-    isDarkMode: Boolean,
-    lightPhase: Float
+    isDarkMode: Boolean
 ) {
-    val glowVisibility = if (messagesEmpty || glowAlpha > 0f) glowAlpha.coerceIn(0f, 1f) else 0f
-    val lightSpots = remember(lightPhase) { geminiChatLightSpots(lightPhase) }
-    val backgroundColor = MaterialTheme.colorScheme.background
-    val primaryColor = MaterialTheme.colorScheme.primary
+    // 呼吸律动：使光影呈现如生命般柔和的起伏微动
+    val infiniteTransition = rememberInfiniteTransition(label = "GeminiGlowBreathing")
+    val breathPhase by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 5400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "breathPhase"
+    )
+
+    // 对话中有消息时依然保留底部柔和的氛围光，空状态时呈现完整辉光
+    val stateAlpha = if (messagesEmpty) 1.0f else 0.85f
+    val currentGlowAlpha = (glowAlpha * stateAlpha).coerceIn(0f, 1f)
+
+    val baseBgColor = if (isDarkMode) Color(0xFF000000) else Color(0xFFFFFFFF)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
+            .background(baseBgColor)
             .drawWithCache {
                 val longestSide = max(size.width, size.height)
-                val bottomHaze = Brush.verticalGradient(
-                    colorStops = arrayOf(
-                        0.00f to Color.Transparent,
-                        0.56f to Color.Transparent,
-                        0.68f to primaryColor.copy(alpha = 0.03f),
-                        0.82f to primaryColor.copy(alpha = 0.07f),
-                        1.00f to primaryColor.copy(alpha = 0.12f)
-                    ),
-                    endY = size.height
+                val breathScale = 0.96f + 0.08f * breathPhase
+                val breathShiftY = 0.015f * (breathPhase - 0.5f)
+
+                // 1. 垂直天幕大气渐变（精准复刻 Gemini 色谱）
+                val verticalAtmosphere = if (isDarkMode) {
+                    Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color.Transparent,
+                            0.52f to Color.Transparent,
+                            0.62f to Color(0xFF020409).copy(alpha = 0.70f),
+                            0.72f to Color(0xFF060D22),
+                            0.82f to Color(0xFF0C1638),
+                            0.92f to Color(0xFF111E48),
+                            1.00f to Color(0xFF142252)
+                        ),
+                        startY = 0f,
+                        endY = size.height
+                    )
+                } else {
+                    Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color.Transparent,
+                            0.50f to Color.Transparent,
+                            0.62f to Color(0xFFF1F7FD),
+                            0.72f to Color(0xFFDEEFFD),
+                            0.82f to Color(0xFFBEDFFE),
+                            0.92f to Color(0xFFA2D3FE),
+                            1.00f to Color(0xFF98CCFE)
+                        ),
+                        startY = 0f,
+                        endY = size.height
+                    )
+                }
+
+                // 2. 底部中央核心主光穹（Light Dome）
+                val centerCenter = Offset(
+                    x = size.width * 0.50f,
+                    y = size.height * (1.02f + breathShiftY)
                 )
-                val surfaceVeil = Brush.verticalGradient(
-                    colorStops = arrayOf(
-                        0.00f to backgroundColor.copy(alpha = 0.96f),
-                        0.48f to backgroundColor.copy(alpha = 0.64f),
-                        0.64f to backgroundColor.copy(alpha = 0.10f),
-                        1.00f to Color.Transparent
-                    ),
-                    endY = size.height
+                val centerRadius = longestSide * 0.76f * breathScale
+                val centerDomeBrush = if (isDarkMode) {
+                    Brush.radialGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color(0xFF1E4085).copy(alpha = 0.80f),
+                            0.32f to Color(0xFF152F66).copy(alpha = 0.55f),
+                            0.60f to Color(0xFF0A1738).copy(alpha = 0.28f),
+                            1.00f to Color.Transparent
+                        ),
+                        center = centerCenter,
+                        radius = centerRadius
+                    )
+                } else {
+                    Brush.radialGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color(0xFF88BEF8).copy(alpha = 0.75f),
+                            0.32f to Color(0xFFA8D3FC).copy(alpha = 0.50f),
+                            0.62f to Color(0xFFD6EBFE).copy(alpha = 0.22f),
+                            1.00f to Color.Transparent
+                        ),
+                        center = centerCenter,
+                        radius = centerRadius
+                    )
+                }
+
+                // 3. 底部两翼漫射光（模拟两边轻微向上的弧形光晕）
+                val leftWingCenter = Offset(
+                    x = 0f,
+                    y = size.height * (0.96f + breathShiftY * 0.5f)
                 )
+                val leftWingRadius = longestSide * 0.54f * breathScale
+                val leftWingBrush = if (isDarkMode) {
+                    Brush.radialGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color(0xFF122452).copy(alpha = 0.50f),
+                            0.55f to Color(0xFF071028).copy(alpha = 0.22f),
+                            1.00f to Color.Transparent
+                        ),
+                        center = leftWingCenter,
+                        radius = leftWingRadius
+                    )
+                } else {
+                    Brush.radialGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color(0xFFA4D1FC).copy(alpha = 0.42f),
+                            0.55f to Color(0xFFCEE6FE).copy(alpha = 0.18f),
+                            1.00f to Color.Transparent
+                        ),
+                        center = leftWingCenter,
+                        radius = leftWingRadius
+                    )
+                }
+
+                val rightWingCenter = Offset(
+                    x = size.width,
+                    y = size.height * (0.96f + breathShiftY * 0.5f)
+                )
+                val rightWingRadius = longestSide * 0.54f * breathScale
+                val rightWingBrush = if (isDarkMode) {
+                    Brush.radialGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color(0xFF122452).copy(alpha = 0.50f),
+                            0.55f to Color(0xFF071028).copy(alpha = 0.22f),
+                            1.00f to Color.Transparent
+                        ),
+                        center = rightWingCenter,
+                        radius = rightWingRadius
+                    )
+                } else {
+                    Brush.radialGradient(
+                        colorStops = arrayOf(
+                            0.00f to Color(0xFFA4D1FC).copy(alpha = 0.42f),
+                            0.55f to Color(0xFFCEE6FE).copy(alpha = 0.18f),
+                            1.00f to Color.Transparent
+                        ),
+                        center = rightWingCenter,
+                        radius = rightWingRadius
+                    )
+                }
 
                 onDrawBehind {
-                    if (!isDarkMode && glowVisibility > 0f) {
-                        drawRect(brush = bottomHaze, alpha = glowVisibility)
-                        lightSpots.forEach { spot ->
-                            val center = Offset(size.width * spot.centerX, size.height * spot.centerY)
-                            val radius = longestSide * spot.radiusScale
-
-                            drawCircle(
-                                brush = Brush.radialGradient(
-                                    colors = listOf(
-                                        primaryColor.copy(alpha = (spot.alpha * 0.12f).coerceAtMost(0.12f)),
-                                        primaryColor.copy(alpha = (spot.alpha * 0.06f).coerceAtMost(0.06f)),
-                                        primaryColor.copy(alpha = (spot.alpha * 0.02f).coerceAtMost(0.02f)),
-                                        Color.Transparent
-                                    ),
-                                    center = center,
-                                    radius = radius
-                                ),
-                                radius = radius,
-                                center = center,
-                                alpha = glowVisibility
-                            )
-                        }
-                        drawRect(brush = surfaceVeil, alpha = glowVisibility)
+                    if (currentGlowAlpha > 0f) {
+                        // 绘制垂直色谱大气
+                        drawRect(brush = verticalAtmosphere, alpha = currentGlowAlpha)
+                        // 绘制中央主光穹
+                        drawCircle(
+                            brush = centerDomeBrush,
+                            radius = centerRadius,
+                            center = centerCenter,
+                            alpha = currentGlowAlpha
+                        )
+                        // 绘制左翼漫射
+                        drawCircle(
+                            brush = leftWingBrush,
+                            radius = leftWingRadius,
+                            center = leftWingCenter,
+                            alpha = currentGlowAlpha
+                        )
+                        // 绘制右翼漫射
+                        drawCircle(
+                            brush = rightWingBrush,
+                            radius = rightWingRadius,
+                            center = rightWingCenter,
+                            alpha = currentGlowAlpha
+                        )
                     }
                 }
             }
@@ -757,33 +840,50 @@ private fun ChatInputBar(
     onInputChange: (String) -> Unit,
     onSend: () -> Unit
 ) {
+    val darkModeManager = LocalDarkModeManager.current
+    val isDarkMode = darkModeManager.isDarkMode()
+
+    val containerBg = if (isDarkMode) {
+        Color(0xFF1E1F24).copy(alpha = 0.94f)
+    } else {
+        Color(0xFFFFFFFF).copy(alpha = 0.96f)
+    }
+    val borderStroke = if (isDarkMode) {
+        BorderStroke(1.dp, Color(0xFF2E313C).copy(alpha = 0.7f))
+    } else {
+        BorderStroke(1.dp, Color(0xFFD6E3F2).copy(alpha = 0.7f))
+    }
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        shape = RoundedCornerShape(SpacingTokens.statusPillRadius),
-        color = colors.surfaceVariant.copy(alpha = 0.5f),
-        shadowElevation = 0.dp,
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        shape = RoundedCornerShape(28.dp),
+        color = containerBg,
+        border = borderStroke,
+        shadowElevation = if (isDarkMode) 2.dp else 4.dp,
         tonalElevation = 0.dp
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
                 value = inputText,
                 onValueChange = onInputChange,
                 modifier = Modifier.weight(1f),
-                placeholder = { Text(placeholder, color = colors.onSurfaceVariant) },
+                placeholder = { Text(placeholder, color = colors.onSurfaceVariant.copy(alpha = 0.75f)) },
                 singleLine = true,
                 enabled = !isLoading,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = colors.transparent,
-                    unfocusedContainerColor = colors.transparent,
-                    disabledContainerColor = colors.transparent,
-                    focusedIndicatorColor = colors.transparent,
-                    unfocusedIndicatorColor = colors.transparent,
-                    disabledIndicatorColor = colors.transparent
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
                 ),
                 textStyle = MaterialTheme.typography.bodyLarge
             )
@@ -793,13 +893,19 @@ private fun ChatInputBar(
                 enabled = !isLoading && inputText.isNotBlank(),
                 modifier = Modifier.size(40.dp),
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = colors.primary,
-                    contentColor = colors.onPrimary
+                    containerColor = if (isDarkMode) Color(0xFF265096) else colors.primary,
+                    contentColor = Color.White,
+                    disabledContainerColor = if (isDarkMode) Color(0xFF282B34) else colors.surfaceVariant.copy(alpha = 0.6f),
+                    disabledContentColor = colors.onSurfaceVariant.copy(alpha = 0.38f)
                 )
             ) {
-                Icon(painterResource(R.drawable.ic_keyboard_return_mirrored), contentDescription = "发送", modifier = Modifier.size(20.dp))
+                Icon(
+                    painterResource(R.drawable.ic_keyboard_return_mirrored),
+                    contentDescription = "发送",
+                    modifier = Modifier.size(20.dp)
+                )
             }
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(2.dp))
         }
     }
 }
