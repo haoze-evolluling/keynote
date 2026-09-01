@@ -92,7 +92,10 @@ fun SettingsScaffold(
                 actions = { actions() },
                 colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = Color.Transparent,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                    // 内容通过 innerPadding 排在顶栏下方，永远不会滚到顶栏底下，
+                    // 顶栏不需要滚动变色。若设为实色，M3 会从 Color.Transparent（RGB 为黑）
+                    // lerp 到该色，滚动中间态是一层半透明灰，表现为盖住上半屏的"阴影"。
+                    scrolledContainerColor = Color.Transparent
                 ),
                 scrollBehavior = scrollBehavior
             )
