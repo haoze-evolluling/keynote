@@ -21,16 +21,19 @@ import com.haoze.keynote.ui.common.NoteDetailsDialog
 import com.haoze.keynote.ui.common.NoteAddTagDialog
 import com.haoze.keynote.ui.common.NoteManageTagsDialog
 import com.haoze.keynote.viewmodel.HomeViewModel
-import com.haoze.keynote.ui.components.DrawerScaffold
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateGroupNotesScreen(
     onNavigateToEdit: (Long) -> Unit,
     onNavigateToTagNotes: (Long, String) -> Unit,
+    onBack: () -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val notes by viewModel.notes.collectAsState()
     var showActionDialogForNote by remember { mutableStateOf<Long?>(null) }
@@ -53,9 +56,9 @@ fun DateGroupNotesScreen(
         }.toSortedMap(Comparator.reverseOrder())
     }
 
-    DrawerScaffold(
+    SettingsScaffold(
         title = "按日期查看",
-        onMenuClick = { openMainNav?.invoke() }
+        onBack = onBack
     ) { innerPadding ->
         if (notes.isEmpty()) {
             Box(
@@ -67,28 +70,24 @@ fun DateGroupNotesScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                // 间隙由 NoteCard 自带 2dp 细线镂空提供，保持全局统一
-                verticalArrangement = Arrangement.spacedBy(0.dp),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                contentPadding = PaddingValues(bottom = 32.dp)
             ) {
                 groupedNotes.forEach { (month, monthNotes) ->
                     item {
-                        Text(
-                            text = month,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.primary,
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 6.dp)
-                        )
-                    }
-                    items(monthNotes, key = { it.note.id }) { noteWithTags ->
-                        NoteCard(
-                            noteWithTags = noteWithTags,
-                            onClick = { onNavigateToEdit(noteWithTags.note.id) },
-                            onTagClick = { tagId, tagName -> onNavigateToTagNotes(tagId, tagName) },
-                            onLongClick = { showActionDialogForNote = noteWithTags.note.id },
-                            modifier = Modifier.animateItem()
-                        )
+                        SettingsGroupTitle(month)
+                        SettingsGroup {
+                            monthNotes.forEachIndexed { index, noteWithTags ->
+                                NoteCard(
+                                    noteWithTags = noteWithTags,
+                                    onClick = { onNavigateToEdit(noteWithTags.note.id) },
+                                    onTagClick = { tagId, tagName -> onNavigateToTagNotes(tagId, tagName) },
+                                    onLongClick = { showActionDialogForNote = noteWithTags.note.id }
+                                )
+                                if (index < monthNotes.lastIndex) {
+                                    SettingsDivider()
+                                }
+                            }
+                        }
                     }
                 }
             }

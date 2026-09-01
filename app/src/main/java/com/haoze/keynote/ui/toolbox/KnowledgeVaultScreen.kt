@@ -47,8 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.KnowledgeVaultEntity
-import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
+import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.SpacingTokens
 import androidx.compose.ui.res.painterResource
@@ -56,13 +55,14 @@ import com.haoze.keynote.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun KnowledgeVaultScreen() {
-    val openMainNav = LocalOpenMainNav.current
+fun KnowledgeVaultScreen(
+    onBack: () -> Unit = {}
+) {
     val viewModel: KnowledgeVaultViewModel = koinViewModel()
 
-    DrawerScaffold(
+    SettingsScaffold(
         title = "资料库",
-        onMenuClick = { openMainNav?.invoke() }
+        onBack = onBack
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
@@ -72,9 +72,9 @@ fun KnowledgeVaultScreen() {
                 .imePadding(),
             contentPadding = PaddingValues(
                 horizontal = SpacingTokens.screenPadding,
-                vertical = SpacingTokens.smallSpacing
+                vertical = SpacingTokens.contentSpacing
             ),
-            verticalArrangement = Arrangement.spacedBy(SpacingTokens.smallSpacing)
+            verticalArrangement = Arrangement.spacedBy(SpacingTokens.contentSpacing)
         ) {
             item {
                 KnowledgeVaultContent(viewModel)

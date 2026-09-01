@@ -34,9 +34,9 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SettingsScreen(
     onNavigateToProviderManage: () -> Unit = {},
+    onBack: () -> Unit = {},
     viewModel: SettingsViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val providers by viewModel.providers.collectAsState()
     val activeProviderId by viewModel.activeProviderId.collectAsState()
     val noteFontSize by viewModel.noteFontSize.collectAsState()
@@ -46,7 +46,7 @@ fun SettingsScreen(
 
     SettingsScaffold(
         title = "设置",
-        onMenuClick = { openMainNav?.invoke() }
+        onBack = onBack
     ) { innerPadding ->
         Column(
             modifier = Modifier

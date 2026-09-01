@@ -33,24 +33,18 @@ fun NoteCard(
     val note = noteWithTags.note
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
 
-    // Bluke 设计语言：独立列表卡片统一 28dp 圆角、surfaceVariant@50%、无阴影，
-    // 卡片间 2dp 细线镂空间隙（上下各 1dp）。
-    Card(
+    // 延续功能中心卡片结构：条目嵌入 SettingsGroup 大卡片容器，条目间由 SettingsDivider 分隔
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = SpacingTokens.screenPadding, vertical = 1.dp)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
-            ),
-        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            )
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(SpacingTokens.smallSpacing)
         ) {
             Text(

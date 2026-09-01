@@ -63,50 +63,57 @@ fun AppPage(
     noteId: Long? = null,
     tagId: Long? = null,
     tagName: String? = null,
+    initialPage: Int = 0,
     onNavigate: (String, Long?, Long?, String?, Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
-    // 页面顶栏 menu 按钮：回到主界面（底部导航栏所在的首页）
+    // 页面顶栏 menu 按钮：回到主界面（底部导航栏所在的功能中心）
     CompositionLocalProvider(
-        LocalOpenMainNav provides { onNavigate(Screen.FeatureHome.route, null, null, null, true) }
+        LocalOpenMainNav provides { onNavigate(Screen.FeatureHome.route, null, null, null, false) }
     ) {
         when (route) {
             Screen.FeatureHome.route -> MainHomeContent(
-                onNavigateToRoute = { target -> onNavigate(target, null, null, null, true) },
-                onNavigateToTag = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, true) },
+                initialPage = initialPage,
+                onNavigateToRoute = { target -> onNavigate(target, null, null, null, false) },
+                onNavigateToTag = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) },
                 onNavigateToEditNote = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) }
             )
             Screen.Home.route -> HomeScreen(
                 onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
-                onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
+                onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) },
+                onBack = onBack
             )
             Screen.EditNote.route -> noteId?.let { EditNoteScreen(it, onNavigateBack = onBack) }
             Screen.AIChat.route -> AIChatScreen(
-                onCreateNote = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) }
+                onCreateNote = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
+                onBack = onBack
             )
-            Screen.Bill.route -> BillScreen()
-            Screen.BillStats.route -> BillStatsScreen()
-            Screen.AaSplit.route -> AaSplitScreen()
-            Screen.Habit.route -> HabitScreen(viewModel = koinViewModel())
+            Screen.Bill.route -> BillScreen(onBack = onBack)
+            Screen.BillStats.route -> BillStatsScreen(onBack = onBack)
+            Screen.AaSplit.route -> AaSplitScreen(onBack = onBack)
+            Screen.Habit.route -> HabitScreen(viewModel = koinViewModel(), onBack = onBack)
             Screen.DateGroupNotes.route -> DateGroupNotesScreen(
                 onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
-                onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
+                onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) },
+                onBack = onBack
             )
-            Screen.Trash.route -> TrashScreen()
-            Screen.DataExport.route -> ExportDataScreen()
-            Screen.Todo.route -> TodoScreen(viewModel = koinViewModel())
-            Screen.Schedule.route -> ScheduleScreen(viewModel = koinViewModel())
-            Screen.KnowledgeVault.route -> KnowledgeVaultScreen()
+            Screen.Trash.route -> TrashScreen(onBack = onBack)
+            Screen.DataExport.route -> ExportDataScreen(onBack = onBack)
+            Screen.Todo.route -> TodoScreen(viewModel = koinViewModel(), onBack = onBack)
+            Screen.Schedule.route -> ScheduleScreen(viewModel = koinViewModel(), onBack = onBack)
+            Screen.KnowledgeVault.route -> KnowledgeVaultScreen(onBack = onBack)
             Screen.Settings.route -> SettingsScreen(
                 onNavigateToProviderManage = {
                     onNavigate(Screen.AiProviderManage.route, null, null, null, false)
-                }
+                },
+                onBack = onBack
             )
             Screen.AiProviderManage.route -> ProviderManagePage(onBack)
             Screen.TagNotes.route -> if (tagId != null) TagNotesScreen(
                 tagId = tagId,
                 tagName = tagName.orEmpty(),
-                onNavigateToEdit = { id -> id?.let { onNavigate(Screen.EditNote.route, it, null, null, false) } }
+                onNavigateToEdit = { id -> id?.let { onNavigate(Screen.EditNote.route, it, null, null, false) } },
+                onBack = onBack
             )
         }
     }
@@ -119,11 +126,12 @@ fun AppPage(
  */
 @Composable
 private fun MainHomeContent(
+    initialPage: Int = 0,
     onNavigateToRoute: (String) -> Unit,
     onNavigateToTag: (Long, String) -> Unit,
     onNavigateToEditNote: (Long) -> Unit,
 ) {
-    val pagerState = rememberPagerState(initialPage = 0) { 2 }
+    val pagerState = rememberPagerState(initialPage = initialPage) { 2 }
     val coroutineScope = rememberCoroutineScope()
 
     BackHandler(enabled = pagerState.currentPage == 1) {

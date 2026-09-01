@@ -28,8 +28,10 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import android.content.ClipData
 import android.content.ClipboardManager
-import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
@@ -40,9 +42,9 @@ import com.haoze.keynote.R
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun BillScreen(
+    onBack: () -> Unit = {},
     viewModel: BillViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val bills by viewModel.bills.collectAsState()
     val billsWithCategory by viewModel.billsWithCategory.collectAsState()
@@ -57,9 +59,9 @@ fun BillScreen(
     var showEditDialogForBill by remember { mutableStateOf<BillEntity?>(null) }
     var showBillDetailsForBill by remember { mutableStateOf<BillEntity?>(null) }
 
-    DrawerScaffold(
-        title = "账单",
-        onMenuClick = { openMainNav?.invoke() },
+    SettingsScaffold(
+        title = "记账",
+        onBack = onBack,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog = true },
@@ -74,18 +76,23 @@ fun BillScreen(
             ) { Text("暂无账单记录", style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant) }
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(SpacingTokens.cardGap),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
-                items(bills, key = { it.id }) { bill ->
-                    Box(modifier = Modifier.animateItem()) {
-                        BillCard(
-                            bill = bill,
-                            categoryName = categoryMap[bill.id]?.catName,
-                            dateFormat = dateFormat,
-                            onLongClick = { showActionDialogForBill = bill.id }
-                        )
+                item {
+                    SettingsGroupTitle("全部账单 (${bills.size})")
+                    SettingsGroup {
+                        bills.forEachIndexed { index, bill ->
+                            BillCard(
+                                bill = bill,
+                                categoryName = categoryMap[bill.id]?.catName,
+                                dateFormat = dateFormat,
+                                onLongClick = { showActionDialogForBill = bill.id }
+                            )
+                            if (index < bills.lastIndex) {
+                                SettingsDivider()
+                            }
+                        }
                     }
                 }
             }
@@ -345,30 +352,27 @@ private fun BillCard(
     onLongClick: () -> Unit
 ) {
     val colors = LocalAppColors.current
-    Card(
-        modifier = Modifier.fillMaxWidth()
-            .combinedClickable(onClick = {}, onLongClick = onLongClick),
-        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(onClick = {}, onLongClick = onLongClick)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = bill.item, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                if (!categoryName.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    AssistChip(onClick = {}, label = { Text(categoryName, style = MaterialTheme.typography.labelSmall) }, modifier = Modifier.height(24.dp))
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = dateFormat.format(Date(bill.date)), style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = bill.item, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            if (!categoryName.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                AssistChip(onClick = {}, label = { Text(categoryName, style = MaterialTheme.typography.labelSmall) }, modifier = Modifier.height(24.dp))
             }
-            Text(
-                text = "¥${String.format("%.2f", bill.amount)}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold, color = colors.primary,
-                textAlign = TextAlign.End, modifier = Modifier.padding(end = 8.dp)
-            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = dateFormat.format(Date(bill.date)), style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
         }
+        Text(
+            text = "¥${String.format("%.2f", bill.amount)}",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold, color = colors.primary,
+            textAlign = TextAlign.End, modifier = Modifier.padding(end = 8.dp)
+        )
     }
 }

@@ -28,10 +28,12 @@ import com.haoze.keynote.data.db.entity.TodoCategoryEntity
 import com.haoze.keynote.data.db.entity.TodoEntity
 import com.haoze.keynote.ui.common.ActionRow
 import com.haoze.keynote.ui.common.ActionMenuDialog
-import com.haoze.keynote.ui.components.DrawerScaffold
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.theme.SpacingTokens
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.util.toDayStartMillis
 import kotlinx.coroutines.delay
@@ -43,9 +45,9 @@ import com.haoze.keynote.R
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun TodoScreen(
+    onBack: () -> Unit = {},
     viewModel: TodoViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val todos by viewModel.todos.collectAsState()
     val categories by viewModel.categories.collectAsState()
@@ -57,9 +59,9 @@ fun TodoScreen(
 
     val groupedTodos = remember(todos) { groupTodosByDate(todos) }
 
-    DrawerScaffold(
+    SettingsScaffold(
         title = "待办事项",
-        onMenuClick = { openMainNav?.invoke() },
+        onBack = onBack,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.openCreateDialog() },
@@ -67,8 +69,7 @@ fun TodoScreen(
             ) {
                 Icon(painterResource(R.drawable.ic_add), contentDescription = "添加待办")
             }
-        },
-        containerColor = colors.background
+        }
     ) { padding ->
         if (todos.isEmpty()) {
             Box(
@@ -83,29 +84,27 @@ fun TodoScreen(
             }
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxSize().padding(padding),
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 groupedTodos.forEach { (label, groupTodos) ->
                     item {
-                        Text(
-                            text = label,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.primary,
-                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-                        )
-                    }
-                    items(groupTodos, key = { it.id }) { todo ->
-                        Box(modifier = Modifier.animateItem()) {
-                            TodoCard(
-                                todo = todo,
-                                categories = categories,
-                                onToggle = { viewModel.toggleComplete(todo) },
-                                onLongClick = {
-                                    selectedTodo = todo
-                                    showBottomSheet = true
+                        SettingsGroupTitle(label)
+                        SettingsGroup {
+                            groupTodos.forEachIndexed { index, todo ->
+                                TodoCard(
+                                    todo = todo,
+                                    categories = categories,
+                                    onToggle = { viewModel.toggleComplete(todo) },
+                                    onLongClick = {
+                                        selectedTodo = todo
+                                        showBottomSheet = true
+                                    }
+                                )
+                                if (index < groupTodos.lastIndex) {
+                                    SettingsDivider()
                                 }
-                            )
+                            }
                         }
                     }
                 }
@@ -218,73 +217,65 @@ private fun TodoCard(
     val dateDf = remember { SimpleDateFormat("M月d日", Locale.CHINESE) }
     val dateTimeDf = remember { SimpleDateFormat("M月d日 HH:mm", Locale.CHINESE) }
 
-    Card(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 1.dp)
             .combinedClickable(
                 onClick = onToggle,
                 onLongClick = onLongClick
-            ),
-        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = todo.isCompleted,
-                onCheckedChange = { onToggle() }
             )
-            Spacer(Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(priorityColor)
-                    )
-                    Spacer(Modifier.width(6.dp))
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = todo.isCompleted,
+            onCheckedChange = { onToggle() }
+        )
+        Spacer(Modifier.width(8.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(priorityColor)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = todo.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = if (!todo.isCompleted) FontWeight.Medium else FontWeight.Normal,
+                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
+                    color = if (todo.isCompleted) colors.onSurfaceVariant else colors.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                if (todo.dueDate != null) {
                     Text(
-                        text = todo.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = if (!todo.isCompleted) FontWeight.Medium else FontWeight.Normal,
-                        textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
-                        color = if (todo.isCompleted) colors.onSurfaceVariant else colors.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        text = if (todo.hasTime) dateTimeDf.format(Date(todo.dueDate))
+                               else dateDf.format(Date(todo.dueDate)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (todo.dueDate < System.currentTimeMillis() && !todo.isCompleted) colors.error
+                                else colors.onSurfaceVariant
                     )
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    if (todo.dueDate != null) {
+                if (category != null) {
+                    Spacer(Modifier.width(8.dp))
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = Color(category.color).copy(alpha = 0.2f)
+                    ) {
                         Text(
-                            text = if (todo.hasTime) dateTimeDf.format(Date(todo.dueDate))
-                                   else dateDf.format(Date(todo.dueDate)),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (todo.dueDate < System.currentTimeMillis() && !todo.isCompleted) colors.error
-                                    else colors.onSurfaceVariant
+                            category.name,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color(category.color)
                         )
-                    }
-                    if (category != null) {
-                        Spacer(Modifier.width(8.dp))
-                        Surface(
-                            shape = MaterialTheme.shapes.small,
-                            color = Color(category.color).copy(alpha = 0.2f)
-                        ) {
-                            Text(
-                                category.name,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color(category.color)
-                            )
-                        }
                     }
                 }
             }

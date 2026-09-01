@@ -15,7 +15,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
 import com.haoze.keynote.ui.components.SettingsInfoText
 import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
@@ -25,9 +27,9 @@ import com.haoze.keynote.R
 
 @Composable
 fun TrashScreen(
+    onBack: () -> Unit = {},
     viewModel: TrashViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val trashItems by viewModel.trashItems.collectAsState()
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
@@ -35,7 +37,7 @@ fun TrashScreen(
 
     SettingsScaffold(
         title = "回收站",
-        onMenuClick = { openMainNav?.invoke() }
+        onBack = onBack
     ) { innerPadding ->
         if (trashItems.isEmpty()) {
             Box(
@@ -54,52 +56,46 @@ fun TrashScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(SpacingTokens.cardGap),
-                contentPadding = PaddingValues(vertical = 12.dp)
+                    .padding(innerPadding),
+                contentPadding = PaddingValues(bottom = 32.dp)
             ) {
                 item {
                     SettingsInfoText(
-                        text = "回收站内容会保留 30 天；永久删除后无法恢复。",
-                        modifier = Modifier.padding(horizontal = 0.dp)
+                        text = "回收站内容会保留 30 天；永久删除后无法恢复。"
                     )
                 }
-                items(trashItems, key = {
-                    when (it) {
-                        is TrashItem.TrashNote -> "note_${it.data.note.id}"
-                        is TrashItem.TrashBill -> "bill_${it.data.id}"
-                        is TrashItem.TrashSchedule -> "schedule_${it.data.id}"
-                        is TrashItem.TrashTodo -> "todo_${it.data.id}"
-                        is TrashItem.TrashHabit -> "habit_${it.data.id}"
-                        is TrashItem.TrashAIChatConversation -> "ai_chat_${it.data.id}"
-                    }
-                }) { item ->
-                    val remainingDays = maxOf(0, 30 - TimeUnit.MILLISECONDS.toDays(
-                        System.currentTimeMillis() - item.deletedAt
-                    ).toInt())
+                item {
+                    SettingsGroupTitle("已删除项目 (${trashItems.size})")
+                    SettingsGroup {
+                        trashItems.forEachIndexed { index, item ->
+                            val remainingDays = maxOf(0, 30 - TimeUnit.MILLISECONDS.toDays(
+                                System.currentTimeMillis() - item.deletedAt
+                            ).toInt())
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        )
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            when (item) {
-                                is TrashItem.TrashNote -> NoteTrashContent(item, remainingDays, dateFormat)
-                                is TrashItem.TrashBill -> BillTrashContent(item, remainingDays, dateFormat)
-                                is TrashItem.TrashSchedule -> ScheduleTrashContent(item, remainingDays, dateFormat)
-                                is TrashItem.TrashTodo -> TodoTrashContent(item, remainingDays, dateFormat)
-                                is TrashItem.TrashHabit -> HabitTrashContent(item, remainingDays, dateFormat)
-                                is TrashItem.TrashAIChatConversation -> AIChatTrashContent(item, remainingDays, dateFormat)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp, vertical = 14.dp)
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth()) {
+                                    when (item) {
+                                        is TrashItem.TrashNote -> NoteTrashContent(item, remainingDays, dateFormat)
+                                        is TrashItem.TrashBill -> BillTrashContent(item, remainingDays, dateFormat)
+                                        is TrashItem.TrashSchedule -> ScheduleTrashContent(item, remainingDays, dateFormat)
+                                        is TrashItem.TrashTodo -> TodoTrashContent(item, remainingDays, dateFormat)
+                                        is TrashItem.TrashHabit -> HabitTrashContent(item, remainingDays, dateFormat)
+                                        is TrashItem.TrashAIChatConversation -> AIChatTrashContent(item, remainingDays, dateFormat)
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    TrashActionButtons(
+                                        onRestore = { viewModel.restore(item) },
+                                        onDelete = { pendingPermanentDelete = item }
+                                    )
+                                }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            TrashActionButtons(
-                                onRestore = { viewModel.restore(item) },
-                                onDelete = { pendingPermanentDelete = item }
-                            )
+                            if (index < trashItems.lastIndex) {
+                                SettingsDivider()
+                            }
                         }
                     }
                 }

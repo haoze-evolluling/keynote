@@ -15,8 +15,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.SpacingTokens
 import androidx.compose.ui.res.painterResource
@@ -25,9 +26,9 @@ import com.haoze.keynote.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BillStatsScreen(
+    onBack: () -> Unit = {},
     viewModel: BillStatsViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val totalSpending by viewModel.totalSpending.collectAsState()
     val billCount by viewModel.billCount.collectAsState()
@@ -44,90 +45,96 @@ fun BillStatsScreen(
 
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
 
-    DrawerScaffold(
+    SettingsScaffold(
         title = "账单统计",
-        onMenuClick = { openMainNav?.invoke() }
+        onBack = onBack
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                listOf(
-                    RangePreset.THIS_WEEK to "本周",
-                    RangePreset.THIS_MONTH to "本月",
-                    RangePreset.THIS_YEAR to "本年",
-                    RangePreset.ALL to "全部"
-                ).forEach { (preset, label) ->
-                    FilterChip(
-                        selected = selectedPreset == preset,
-                        onClick = {
-                            selectedPreset = preset
-                            viewModel.setPresetRange(preset)
-                        },
-                        label = { Text(label) },
-                        shape = RoundedCornerShape(12.dp)
+            SettingsGroupTitle("时间范围")
+            SettingsGroup {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        listOf(
+                            RangePreset.THIS_WEEK to "本周",
+                            RangePreset.THIS_MONTH to "本月",
+                            RangePreset.THIS_YEAR to "本年",
+                            RangePreset.ALL to "全部"
+                        ).forEach { (preset, label) ->
+                            FilterChip(
+                                selected = selectedPreset == preset,
+                                onClick = {
+                                    selectedPreset = preset
+                                    viewModel.setPresetRange(preset)
+                                },
+                                label = { Text(label) },
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        }
+                        FilterChip(
+                            selected = selectedPreset == RangePreset.CUSTOM,
+                            onClick = { showCustomRangePicker = true },
+                            label = { Text("自定义") },
+                            shape = RoundedCornerShape(12.dp),
+                            trailingIcon = { Icon(painterResource(R.drawable.ic_date_range), contentDescription = null, modifier = Modifier.size(16.dp)) }
+                        )
+                    }
+
+                    if (selectedPreset == RangePreset.CUSTOM) {
+                        Text(
+                            "${dateFormat.format(Date(dateRange.first))} ~ ${dateFormat.format(Date(dateRange.second))}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            SettingsGroupTitle("数据摘要")
+            SettingsGroup {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        SummaryCard("总支出", "¥${String.format("%.2f", totalSpending)}", colors.statTotalSpending, Modifier.weight(1f))
+                        SummaryCard("账单数", "$billCount", colors.statBillCount, Modifier.weight(1f))
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        val dayCount = ((dateRange.second - dateRange.first) / (24 * 60 * 60 * 1000)).toInt().coerceAtLeast(1)
+                        val dailyAvg = totalSpending / dayCount
+                        SummaryCard("日均", "¥${String.format("%.2f", dailyAvg)}", colors.statDailyAvg, Modifier.weight(1f))
+                        val topCategory = categoryStats.maxByOrNull { it.total }
+                        SummaryCard(
+                            "最高类别",
+                            topCategory?.categoryName ?: "-",
+                            colors.statTopCategory,
+                            Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
+            SettingsGroupTitle("支出分布")
+            SettingsGroup {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    DonutChart(
+                        data = categoryStats,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-                FilterChip(
-                    selected = selectedPreset == RangePreset.CUSTOM,
-                    onClick = { showCustomRangePicker = true },
-                    label = { Text("自定义") },
-                    shape = RoundedCornerShape(12.dp),
-                    trailingIcon = { Icon(painterResource(R.drawable.ic_date_range), contentDescription = null, modifier = Modifier.size(16.dp)) }
-                )
             }
-
-            if (selectedPreset == RangePreset.CUSTOM) {
-                Text(
-                    "${dateFormat.format(Date(dateRange.first))} ~ ${dateFormat.format(Date(dateRange.second))}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.onSurfaceVariant
-                )
-            }
-
-            HorizontalDivider()
-
-            Text("摘要", style = MaterialTheme.typography.titleMedium)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                SummaryCard("总支出", "¥${String.format("%.2f", totalSpending)}", colors.statTotalSpending, Modifier.weight(1f))
-                SummaryCard("账单数", "$billCount", colors.statBillCount, Modifier.weight(1f))
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                val dayCount = ((dateRange.second - dateRange.first) / (24 * 60 * 60 * 1000)).toInt().coerceAtLeast(1)
-                val dailyAvg = totalSpending / dayCount
-                SummaryCard("日均", "¥${String.format("%.2f", dailyAvg)}", colors.statDailyAvg, Modifier.weight(1f))
-                val topCategory = categoryStats.maxByOrNull { it.total }
-                SummaryCard(
-                    "最高类别",
-                    topCategory?.categoryName ?: "-",
-                    colors.statTopCategory,
-                    Modifier.weight(1f)
-                )
-            }
-
-            HorizontalDivider()
-
-            Text("支出分布", style = MaterialTheme.typography.titleMedium)
-            DonutChart(
-                data = categoryStats,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            HorizontalDivider()
 
             val trendData = when (granularity) {
                 Granularity.DAY -> dailyTrend.toChartPoints()
@@ -135,39 +142,47 @@ fun BillStatsScreen(
                 Granularity.MONTH -> monthlyTrend.toChartPoints()
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("支出趋势", style = MaterialTheme.typography.titleMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    listOf(
-                        Granularity.DAY to "日",
-                        Granularity.WEEK to "周",
-                        Granularity.MONTH to "月"
-                    ).forEach { (g, label) ->
-                        FilterChip(
-                            selected = granularity == g,
-                            onClick = { viewModel.setGranularity(g) },
-                            label = { Text(label) },
-                            shape = RoundedCornerShape(12.dp)
-                        )
+            SettingsGroupTitle("支出趋势")
+            SettingsGroup {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            listOf(
+                                Granularity.DAY to "日",
+                                Granularity.WEEK to "周",
+                                Granularity.MONTH to "月"
+                            ).forEach { (g, label) ->
+                                FilterChip(
+                                    selected = granularity == g,
+                                    onClick = { viewModel.setGranularity(g) },
+                                    label = { Text(label) },
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                            }
+                        }
                     }
+                    LineChart(
+                        data = trendData,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
-            LineChart(
-                data = trendData,
-                modifier = Modifier.fillMaxWidth()
-            )
 
-            HorizontalDivider()
+            SettingsGroupTitle("每日支出")
+            SettingsGroup {
+                Box(modifier = Modifier.padding(16.dp)) {
+                    BarChart(
+                        data = dailySpending,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
 
-            Text("每日支出", style = MaterialTheme.typography.titleMedium)
-            BarChart(
-                data = dailySpending,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Spacer(Modifier.height(32.dp))
         }
     }
 

@@ -57,8 +57,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.HabitEntity
-import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.theme.SpacingTokens
@@ -77,9 +79,9 @@ private val habitColors = listOf(
 
 @Composable
 fun HabitScreen(
+    onBack: () -> Unit = {},
     viewModel: HabitViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val progressItems by viewModel.progressItems.collectAsState()
     val showEditor by viewModel.showEditor.collectAsState()
@@ -87,9 +89,9 @@ fun HabitScreen(
 
     var habitToDelete by remember { mutableStateOf<HabitEntity?>(null) }
 
-    DrawerScaffold(
+    SettingsScaffold(
         title = "习惯打卡",
-        onMenuClick = { openMainNav?.invoke() },
+        onBack = onBack,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.openCreateEditor() },
@@ -97,8 +99,7 @@ fun HabitScreen(
             ) {
                 Icon(painterResource(R.drawable.ic_add), contentDescription = "添加习惯")
             }
-        },
-        containerColor = colors.background
+        }
     ) { padding ->
         if (progressItems.isEmpty()) {
             HabitEmptyState(
@@ -111,22 +112,27 @@ fun HabitScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = SpacingTokens.screenPadding),
-                contentPadding = PaddingValues(bottom = 96.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(padding),
+                contentPadding = PaddingValues(bottom = 96.dp)
             ) {
                 item {
+                    SettingsGroupTitle("习惯概览")
                     HabitSummary(progressItems)
                 }
-                items(progressItems, key = { it.habit.id }) { item ->
-                    Box(modifier = Modifier.animateItem()) {
-                        HabitCard(
-                            item = item,
-                            onToggle = { viewModel.toggleTodayCheckIn(item.habit.id) },
-                            onEdit = { viewModel.openEditEditor(item.habit) },
-                            onDelete = { habitToDelete = item.habit }
-                        )
+                item {
+                    SettingsGroupTitle("全部习惯 (${progressItems.size})")
+                    SettingsGroup {
+                        progressItems.forEachIndexed { index, item ->
+                            HabitCard(
+                                item = item,
+                                onToggle = { viewModel.toggleTodayCheckIn(item.habit.id) },
+                                onEdit = { viewModel.openEditEditor(item.habit) },
+                                onDelete = { habitToDelete = item.habit }
+                            )
+                            if (index < progressItems.lastIndex) {
+                                SettingsDivider()
+                            }
+                        }
                     }
                 }
             }
@@ -208,7 +214,7 @@ private fun HabitSummary(items: List<HabitProgressItem>) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 12.dp)
+            .padding(horizontal = 16.dp)
     ) {
         HabitStatCard("今日", "$checkedToday/${items.size}", Modifier.weight(1f))
         HabitStatCard("最长连续", "${bestStreak}天", Modifier.weight(1f))
@@ -259,81 +265,76 @@ private fun HabitCard(
     val accent = Color(item.habit.color)
     val todayStart = remember { System.currentTimeMillis().toDayStartMillis() }
 
-    Card(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onToggle),
-        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+            .clickable(onClick = onToggle)
+            .padding(horizontal = 20.dp, vertical = 14.dp)
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = if (item.checkedToday) painterResource(R.drawable.ic_check_circle) else painterResource(R.drawable.ic_radio_button_unchecked),
-                    contentDescription = if (item.checkedToday) "取消今日打卡" else "今日打卡",
-                    tint = if (item.checkedToday) accent else colors.onSurfaceVariant,
-                    modifier = Modifier.size(28.dp)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = if (item.checkedToday) painterResource(R.drawable.ic_check_circle) else painterResource(R.drawable.ic_radio_button_unchecked),
+                contentDescription = if (item.checkedToday) "取消今日打卡" else "今日打卡",
+                tint = if (item.checkedToday) accent else colors.onSurfaceVariant,
+                modifier = Modifier.size(28.dp)
+            )
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    item.habit.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Spacer(Modifier.width(10.dp))
-                Column(modifier = Modifier.weight(1f)) {
+                if (item.habit.description.isNotBlank()) {
                     Text(
-                        item.habit.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
+                        item.habit.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    if (item.habit.description.isNotBlank()) {
-                        Text(
-                            item.habit.description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = colors.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-                IconButton(onClick = onEdit) {
-                    Icon(painterResource(R.drawable.ic_edit), contentDescription = "编辑习惯")
-                }
-                IconButton(onClick = onDelete) {
-                    Icon(painterResource(R.drawable.ic_delete), contentDescription = "删除习惯")
                 }
             }
+            IconButton(onClick = onEdit) {
+                Icon(painterResource(R.drawable.ic_edit), contentDescription = "编辑习惯")
+            }
+            IconButton(onClick = onDelete) {
+                Icon(painterResource(R.drawable.ic_delete), contentDescription = "删除习惯")
+            }
+        }
 
-            Spacer(Modifier.height(12.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    "连续 ${item.currentStreak} 天",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.onSurfaceVariant
+        Spacer(Modifier.height(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "连续 ${item.currentStreak} 天",
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(
+                "周目标 ${item.weeklyCompletionPercent}%",
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant
+            )
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            (6 downTo 0).forEach { offset ->
+                val day = todayStart - offset * DayMillis
+                val checked = day in item.recentCheckInDays
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(CircleShape)
+                        .background(if (checked) accent else colors.surfaceVariant)
+                        .border(
+                            width = 1.dp,
+                            color = if (checked) accent else colors.outlineVariant,
+                            shape = CircleShape
+                        )
                 )
-                Spacer(Modifier.width(12.dp))
-                Text(
-                    "周目标 ${item.weeklyCompletionPercent}%",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.onSurfaceVariant
-                )
-            }
-            Spacer(Modifier.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                (6 downTo 0).forEach { offset ->
-                    val day = todayStart - offset * DayMillis
-                    val checked = day in item.recentCheckInDays
-                    Box(
-                        modifier = Modifier
-                            .size(18.dp)
-                            .clip(CircleShape)
-                            .background(if (checked) accent else colors.surfaceVariant)
-                            .border(
-                                width = 1.dp,
-                                color = if (checked) accent else colors.outlineVariant,
-                                shape = CircleShape
-                            )
-                    )
-                }
             }
         }
     }

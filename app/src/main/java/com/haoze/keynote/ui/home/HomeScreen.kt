@@ -19,8 +19,10 @@ import com.haoze.keynote.ui.common.NoteDetailsDialog
 import com.haoze.keynote.ui.common.NoteAddTagDialog
 import com.haoze.keynote.ui.common.NoteManageTagsDialog
 import androidx.compose.runtime.rememberCoroutineScope
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
-import com.haoze.keynote.ui.components.DrawerScaffold
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
 import androidx.compose.ui.res.painterResource
@@ -31,10 +33,10 @@ import com.haoze.keynote.R
 fun HomeScreen(
     onNavigateToEdit: (Long) -> Unit,
     onNavigateToTagNotes: (Long, String) -> Unit,
+    onBack: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val scope = rememberCoroutineScope()
     val colors = LocalAppColors.current
     val notes by viewModel.notes.collectAsState()
@@ -50,9 +52,9 @@ fun HomeScreen(
 
     val context = LocalContext.current
 
-    DrawerScaffold(
-        title = "KeyNote",
-        onMenuClick = { openMainNav?.invoke() },
+    SettingsScaffold(
+        title = "笔记列表",
+        onBack = onBack,
         modifier = modifier,
         floatingActionButton = {
             Box(modifier = Modifier.padding(bottom = 16.dp)) {
@@ -90,22 +92,29 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "暂无笔记，点击右下角 + 新建",
+                            if (searchQuery.isNotBlank()) "未找到相关笔记" else "暂无笔记，点击右下角 + 新建",
                             style = MaterialTheme.typography.bodyMedium,
                             color = colors.onSurfaceVariant
                         )
                     }
                 }
-            }
-
-            items(notes, key = { it.note.id }) { noteWithTags ->
-                NoteCard(
-                    noteWithTags = noteWithTags,
-                    onClick = { onNavigateToEdit(noteWithTags.note.id) },
-                    onTagClick = { tagId, tagName -> onNavigateToTagNotes(tagId, tagName) },
-                    onLongClick = { showActionDialogForNote = noteWithTags.note.id },
-                    modifier = Modifier.animateItem()
-                )
+            } else {
+                item {
+                    SettingsGroupTitle(if (searchQuery.isNotBlank()) "搜索结果 (${notes.size})" else "全部笔记")
+                    SettingsGroup {
+                        notes.forEachIndexed { index, noteWithTags ->
+                            NoteCard(
+                                noteWithTags = noteWithTags,
+                                onClick = { onNavigateToEdit(noteWithTags.note.id) },
+                                onTagClick = { tagId, tagName -> onNavigateToTagNotes(tagId, tagName) },
+                                onLongClick = { showActionDialogForNote = noteWithTags.note.id }
+                            )
+                            if (index < notes.lastIndex) {
+                                SettingsDivider()
+                            }
+                        }
+                    }
+                }
             }
         }
     }

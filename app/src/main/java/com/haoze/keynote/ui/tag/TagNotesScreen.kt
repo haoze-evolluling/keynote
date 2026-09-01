@@ -22,7 +22,10 @@ import com.haoze.keynote.ui.common.NoteDeleteConfirmDialog
 import com.haoze.keynote.ui.common.NoteDetailsDialog
 import com.haoze.keynote.ui.common.NoteAddTagDialog
 import com.haoze.keynote.ui.common.NoteManageTagsDialog
-import com.haoze.keynote.ui.components.DrawerScaffold
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,9 +33,9 @@ fun TagNotesScreen(
     tagId: Long,
     tagName: String,
     onNavigateToEdit: (Long?) -> Unit,
+    onBack: () -> Unit = {},
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val allNotes by viewModel.notes.collectAsState()
     var showActionDialogForNote by remember { mutableStateOf<Long?>(null) }
@@ -50,9 +53,9 @@ fun TagNotesScreen(
         allNotes.filter { noteWithTags -> noteWithTags.tags.any { it.id == tagId } }
     }
 
-    DrawerScaffold(
+    SettingsScaffold(
         title = "#$tagName",
-        onMenuClick = { openMainNav?.invoke() }
+        onBack = onBack
     ) { innerPadding ->
         if (filteredNotes.isEmpty()) {
             Box(
@@ -64,16 +67,23 @@ fun TagNotesScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                contentPadding = PaddingValues(bottom = 32.dp)
             ) {
-                items(filteredNotes, key = { it.note.id }) { noteWithTags ->
-                    NoteCard(
-                        noteWithTags = noteWithTags,
-                        onClick = { onNavigateToEdit(noteWithTags.note.id) },
-                        onTagClick = { _, _ -> },
-                        onLongClick = { showActionDialogForNote = noteWithTags.note.id },
-                        modifier = Modifier.animateItem()
-                    )
+                item {
+                    SettingsGroupTitle("标签笔记 (${filteredNotes.size})")
+                    SettingsGroup {
+                        filteredNotes.forEachIndexed { index, noteWithTags ->
+                            NoteCard(
+                                noteWithTags = noteWithTags,
+                                onClick = { onNavigateToEdit(noteWithTags.note.id) },
+                                onTagClick = { _, _ -> },
+                                onLongClick = { showActionDialogForNote = noteWithTags.note.id }
+                            )
+                            if (index < filteredNotes.lastIndex) {
+                                SettingsDivider()
+                            }
+                        }
+                    }
                 }
             }
         }

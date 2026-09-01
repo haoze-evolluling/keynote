@@ -50,8 +50,9 @@ import com.haoze.keynote.ui.components.SettingsScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExportDataScreen() {
-    val openMainNav = LocalOpenMainNav.current
+fun ExportDataScreen(
+    onBack: () -> Unit = {}
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -66,7 +67,7 @@ fun ExportDataScreen() {
 
     SettingsScaffold(
         title = "导出数据",
-        onMenuClick = { openMainNav?.invoke() },
+        onBack = onBack,
         snackbarHostState = snackbarHostState
     ) { innerPadding ->
         Column(

@@ -65,6 +65,7 @@ abstract class KeyNotePageActivity : ComponentActivity() {
                             noteId = intent.getLongExtra(EXTRA_NOTE_ID, -1L).takeIf { it >= 0L },
                             tagId = intent.getLongExtra(EXTRA_TAG_ID, -1L).takeIf { it >= 0L },
                             tagName = intent.getStringExtra(EXTRA_TAG_NAME),
+                            initialPage = intent.getIntExtra(EXTRA_INITIAL_PAGE, 0),
                             onNavigate = { route, noteId, tagId, tagName, replace ->
                                 startActivity(createIntent(this, route, noteId, tagId, tagName))
                                 if (replace) finish()
@@ -81,8 +82,16 @@ abstract class KeyNotePageActivity : ComponentActivity() {
         const val EXTRA_NOTE_ID = "note_id"
         const val EXTRA_TAG_ID = "tag_id"
         const val EXTRA_TAG_NAME = "tag_name"
+        const val EXTRA_INITIAL_PAGE = "initial_page"
 
-        fun createIntent(context: Context, route: String, noteId: Long?, tagId: Long?, tagName: String?): Intent {
+        fun createIntent(
+            context: Context,
+            route: String,
+            noteId: Long?,
+            tagId: Long?,
+            tagName: String?,
+            initialPage: Int = 0
+        ): Intent {
             val activity = when (route) {
                 Screen.FeatureHome.route -> MainActivity::class.java
                 Screen.Home.route -> NotesActivity::class.java
@@ -107,6 +116,7 @@ abstract class KeyNotePageActivity : ComponentActivity() {
                 noteId?.let { putExtra(EXTRA_NOTE_ID, it) }
                 tagId?.let { putExtra(EXTRA_TAG_ID, it) }
                 tagName?.let { putExtra(EXTRA_TAG_NAME, it) }
+                if (initialPage != 0) putExtra(EXTRA_INITIAL_PAGE, initialPage)
             }
         }
     }

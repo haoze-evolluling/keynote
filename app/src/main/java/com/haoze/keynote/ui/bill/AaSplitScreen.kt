@@ -16,8 +16,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.AaSplitEntity
-import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
@@ -32,9 +34,9 @@ import com.haoze.keynote.R
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AaSplitScreen(
+    onBack: () -> Unit = {},
     viewModel: AaSplitViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val aaSplits by viewModel.aaSplits.collectAsState()
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
@@ -43,9 +45,9 @@ fun AaSplitScreen(
     var showDetailDialog by remember { mutableStateOf<AaSplitEntity?>(null) }
     var showDeleteConfirm by remember { mutableStateOf<AaSplitEntity?>(null) }
 
-    DrawerScaffold(
-        title = "AA计算",
-        onMenuClick = { openMainNav?.invoke() },
+    SettingsScaffold(
+        title = "AA 计算",
+        onBack = onBack,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog = true },
@@ -60,17 +62,22 @@ fun AaSplitScreen(
             ) { Text("暂无AA计算记录", style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant) }
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
-                items(aaSplits, key = { it.id }) { aaSplit ->
-                    Box(modifier = Modifier.animateItem()) {
-                        AaSplitCard(
-                            aaSplit = aaSplit,
-                            dateFormat = dateFormat,
-                            onClick = { showDetailDialog = aaSplit }
-                        )
+                item {
+                    SettingsGroupTitle("分摊记录 (${aaSplits.size})")
+                    SettingsGroup {
+                        aaSplits.forEachIndexed { index, aaSplit ->
+                            AaSplitCard(
+                                aaSplit = aaSplit,
+                                dateFormat = dateFormat,
+                                onClick = { showDetailDialog = aaSplit }
+                            )
+                            if (index < aaSplits.lastIndex) {
+                                SettingsDivider()
+                            }
+                        }
                     }
                 }
             }
@@ -151,52 +158,45 @@ private fun AaSplitCard(
     onClick: () -> Unit
 ) {
     val colors = LocalAppColors.current
-    Card(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(onClick = onClick),
-        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+            .combinedClickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    aaSplit.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    "¥${String.format("%.2f", aaSplit.perPersonAmount)}/人",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.primary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    "共${aaSplit.personCount}人 · 总计¥${String.format("%.2f", aaSplit.totalAmount)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.onSurfaceVariant
-                )
-                Text(
-                    dateFormat.format(Date(aaSplit.date)),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.onSurfaceVariant
-                )
-            }
+            Text(
+                aaSplit.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                "¥${String.format("%.2f", aaSplit.perPersonAmount)}/人",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.primary,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "共${aaSplit.personCount}人 · 总计¥${String.format("%.2f", aaSplit.totalAmount)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant
+            )
+            Text(
+                dateFormat.format(Date(aaSplit.date)),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.onSurfaceVariant
+            )
         }
     }
 }

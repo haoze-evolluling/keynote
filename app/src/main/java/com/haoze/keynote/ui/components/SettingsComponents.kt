@@ -57,6 +57,8 @@ fun SettingsScaffold(
     onBack: (() -> Unit)? = null,
     onMenuClick: (() -> Unit)? = null,
     snackbarHostState: SnackbarHostState? = null,
+    floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
     actions: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -100,6 +102,8 @@ fun SettingsScaffold(
                 scrollBehavior = scrollBehavior
             )
         },
+        floatingActionButton = floatingActionButton,
+        floatingActionButtonPosition = floatingActionButtonPosition,
         snackbarHost = {
             if (snackbarHostState != null) {
                 SnackbarHost(snackbarHostState)

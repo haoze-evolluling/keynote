@@ -33,7 +33,10 @@ import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.theme.SpacingTokens
 import com.haoze.keynote.ui.common.ActionMenuDialog
-import com.haoze.keynote.ui.components.DrawerScaffold
+import com.haoze.keynote.ui.components.SettingsDivider
+import com.haoze.keynote.ui.components.SettingsGroup
+import com.haoze.keynote.ui.components.SettingsGroupTitle
+import com.haoze.keynote.ui.components.SettingsScaffold
 import androidx.compose.ui.res.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.R
@@ -41,9 +44,9 @@ import com.haoze.keynote.R
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ScheduleScreen(
+    onBack: () -> Unit = {},
     viewModel: ScheduleViewModel = koinViewModel()
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val context = LocalContext.current
     val schedules by viewModel.schedules.collectAsState()
@@ -82,9 +85,9 @@ fun ScheduleScreen(
         }.toSortedMap(Comparator.reverseOrder())
     }
 
-    DrawerScaffold(
+    SettingsScaffold(
         title = "日程",
-        onMenuClick = { openMainNav?.invoke() },
+        onBack = onBack,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog = true },
@@ -113,52 +116,47 @@ fun ScheduleScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(SpacingTokens.cardGap),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 groupedSchedules.forEach { (month, monthSchedules) ->
                     item {
-                        Text(
-                            text = month,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.primary,
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp)
-                        )
-                    }
-                    items(monthSchedules, key = { it.id }) { schedule ->
-                        val linkedNote = notes.find { it.note.id == schedule.noteId }
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .animateItem()
-                                .combinedClickable(onClick = {}, onLongClick = { showActionDialogForSchedule = schedule.id }),
-                            shape = RoundedCornerShape(SpacingTokens.listCardRadius),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                            )
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(schedule.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(dateFormat.format(Date(schedule.date)), style = MaterialTheme.typography.bodySmall, color = colors.outline)
-                                    if (schedule.location != null) {
-                                        Spacer(Modifier.height(2.dp))
-                                        Text("📍 ${schedule.location}", style = MaterialTheme.typography.bodySmall, color = colors.outline)
+                        SettingsGroupTitle(month)
+                        SettingsGroup {
+                            monthSchedules.forEachIndexed { index, schedule ->
+                                val linkedNote = notes.find { it.note.id == schedule.noteId }
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .combinedClickable(
+                                            onClick = {},
+                                            onLongClick = { showActionDialogForSchedule = schedule.id }
+                                        )
+                                        .padding(horizontal = 20.dp, vertical = 14.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(schedule.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                            Spacer(Modifier.height(4.dp))
+                                            Text(dateFormat.format(Date(schedule.date)), style = MaterialTheme.typography.bodySmall, color = colors.outline)
+                                            if (schedule.location != null) {
+                                                Spacer(Modifier.height(2.dp))
+                                                Text("📍 ${schedule.location}", style = MaterialTheme.typography.bodySmall, color = colors.outline)
+                                            }
+                                            if (linkedNote != null) {
+                                                Spacer(Modifier.height(2.dp))
+                                                Text("关联: ${linkedNote.note.title.ifBlank { "无标题" }}", style = MaterialTheme.typography.bodySmall, color = colors.primary)
+                                            }
+                                        }
                                     }
-                                    if (linkedNote != null) {
-                                        Spacer(Modifier.height(2.dp))
-                                        Text("关联: ${linkedNote.note.title.ifBlank { "无标题" }}", style = MaterialTheme.typography.bodySmall, color = colors.primary)
-                                    }
+                                }
+                                if (index < monthSchedules.lastIndex) {
+                                    SettingsDivider()
                                 }
                             }
                         }
-                        Spacer(Modifier.height(4.dp))
                     }
                 }
             }

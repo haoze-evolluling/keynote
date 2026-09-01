@@ -57,6 +57,7 @@ import kotlin.math.max
 fun AIChatScreen(
     viewModel: AIChatViewModel = koinViewModel(),
     onCreateNote: (Long) -> Unit = {},
+    onBack: () -> Unit = {},
     embeddedInHome: Boolean = false
 ) {
     val openMainNav = LocalOpenMainNav.current
@@ -167,10 +168,13 @@ fun AIChatScreen(
                         actionIconContentColor = colors.onSurface
                     ),
                     navigationIcon = {
-                        // 首页嵌入模式已在主界面，无需菜单按钮
+                        // 首页嵌入模式已在主界面，无需返回按钮；非嵌入模式显示返回上一级（功能中心）
                         if (!embeddedInHome) {
-                            IconButton(onClick = { openMainNav?.invoke() }) {
-                                Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
+                            IconButton(onClick = onBack) {
+                                Icon(
+                                    painterResource(R.drawable.ic_arrow_back_mirrored),
+                                    contentDescription = "返回"
+                                )
                             }
                         }
                     },
