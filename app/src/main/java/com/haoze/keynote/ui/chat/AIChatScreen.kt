@@ -44,11 +44,19 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.max
 
+/**
+ * AI 对话页。
+ *
+ * @param embeddedInHome 以首页身份嵌入主界面 Pager 时为 true：
+ * 隐藏顶栏菜单按钮（已在主界面），并给输入框底部预留悬浮导航栏的空间，
+ * 避免底栏遮挡输入框。
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AIChatScreen(
     viewModel: AIChatViewModel = koinViewModel(),
-    onCreateNote: (Long) -> Unit = {}
+    onCreateNote: (Long) -> Unit = {},
+    embeddedInHome: Boolean = false
 ) {
     val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
@@ -157,8 +165,11 @@ fun AIChatScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.surface),
                 navigationIcon = {
-                    IconButton(onClick = { openMainNav?.invoke() }) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
+                    // 首页嵌入模式已在主界面，无需菜单按钮
+                    if (!embeddedInHome) {
+                        IconButton(onClick = { openMainNav?.invoke() }) {
+                            Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
+                        }
                     }
                 },
                 actions = {
@@ -249,7 +260,13 @@ fun AIChatScreen(
                     isLoading = isLoading,
                     placeholder = assistantText.inputPlaceholder,
                     colors = colors,
-                    modifier = Modifier.navigationBarsPadding(),
+                    modifier = if (embeddedInHome) {
+                        // 底部预留悬浮导航栏空间：16dp 底距 + 64dp 栏高 + 8dp 间隙
+                        // （ChatInputBar 自身还有 12dp 纵向 padding，合计输入框底部约 88dp）
+                        Modifier.navigationBarsPadding().padding(bottom = 76.dp)
+                    } else {
+                        Modifier.navigationBarsPadding()
+                    },
                     onInputChange = { inputText = it },
                     onSend = { viewModel.sendMessage(inputText); inputText = "" }
                 )

@@ -24,7 +24,6 @@ import com.haoze.keynote.ui.habit.HabitScreen
 import com.haoze.keynote.ui.home.DateGroupNotesScreen
 import com.haoze.keynote.ui.home.ExportDataScreen
 import com.haoze.keynote.ui.home.FeatureCenterScreen
-import com.haoze.keynote.ui.home.FeatureHomeScreen
 import com.haoze.keynote.ui.home.HomeScreen
 import com.haoze.keynote.ui.schedule.ScheduleScreen
 import com.haoze.keynote.ui.settings.AiProviderManageScreen
@@ -38,6 +37,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 sealed class Screen(val route: String, val title: String) {
+    // 主界面路由：首页现为 AI 对话页（嵌入主界面 Pager，带底部导航栏）
     data object FeatureHome : Screen("feature_home", "首页")
     data object Home : Screen("home", "笔记")
     data object EditNote : Screen("edit_note", "编辑笔记")
@@ -73,14 +73,17 @@ fun AppPage(
         when (route) {
             Screen.FeatureHome.route -> MainHomeContent(
                 onNavigateToRoute = { target -> onNavigate(target, null, null, null, true) },
-                onNavigateToTag = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, true) }
+                onNavigateToTag = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, true) },
+                onNavigateToEditNote = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) }
             )
             Screen.Home.route -> HomeScreen(
                 onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
                 onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
             )
             Screen.EditNote.route -> noteId?.let { EditNoteScreen(it, onNavigateBack = onBack) }
-            Screen.AIChat.route -> AIChatScreen { id -> onNavigate(Screen.EditNote.route, id, null, null, false) }
+            Screen.AIChat.route -> AIChatScreen(
+                onCreateNote = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) }
+            )
             Screen.Bill.route -> BillScreen()
             Screen.BillStats.route -> BillStatsScreen()
             Screen.AaSplit.route -> AaSplitScreen()
@@ -110,13 +113,15 @@ fun AppPage(
 }
 
 /**
- * 主界面：与谛听一致的双页结构（首页 / 功能中心），
+ * 主界面：双页结构（AI 对话 / 功能中心），
  * HorizontalPager 承载两页，底部悬浮 FloatingNavigationBar 联动切换。
+ * 首页即 AI 对话页，避免与功能中心的导航入口重复。
  */
 @Composable
 private fun MainHomeContent(
     onNavigateToRoute: (String) -> Unit,
     onNavigateToTag: (Long, String) -> Unit,
+    onNavigateToEditNote: (Long) -> Unit,
 ) {
     val pagerState = rememberPagerState(initialPage = 0) { 2 }
     val coroutineScope = rememberCoroutineScope()
@@ -136,7 +141,11 @@ private fun MainHomeContent(
             modifier = Modifier.fillMaxSize()
         ) { page ->
             if (page == 0) {
-                FeatureHomeScreen(onNavigateToRoute = onNavigateToRoute)
+                // 首页 = AI 对话页；输入框内部已为底部悬浮导航栏预留空间
+                AIChatScreen(
+                    onCreateNote = onNavigateToEditNote,
+                    embeddedInHome = true
+                )
             } else {
                 FeatureCenterScreen(
                     onNavigateToRoute = onNavigateToRoute,

@@ -350,8 +350,8 @@ fun FloatingNavigationBar(
             FloatingBottomBarTab(
                 weight = tab0Weight,
                 pressProgress = dampedDragAnimation.pressProgress,
-                icon = painterResource(R.drawable.ic_dashboard),
-                label = "首页",
+                icon = painterResource(R.drawable.ic_psychology_outlined),
+                label = "AI 对话",
                 accentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 contentColor = tabContentColor
             )
