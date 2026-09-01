@@ -36,7 +36,6 @@
         </activity>
         <activity android:name=".NotesActivity" />
         <activity android:name=".EditNoteActivity" />
-        <activity android:name=".AiChatActivity" />
         <activity android:name=".BillActivity" />
         <activity android:name=".BillStatsActivity" />
         <activity android:name=".AaSplitActivity" />

@@ -41,7 +41,6 @@ sealed class Screen(val route: String, val title: String) {
     data object FeatureHome : Screen("feature_home", "首页")
     data object Home : Screen("home", "笔记")
     data object EditNote : Screen("edit_note", "编辑笔记")
-    data object AIChat : Screen("ai_chat", "AI对话")
     data object Bill : Screen("bill", "记账")
     data object BillStats : Screen("bill_stats", "账单统计")
     data object AaSplit : Screen("aa_split", "AA计算")
@@ -84,10 +83,6 @@ fun AppPage(
                 onBack = onBack
             )
             Screen.EditNote.route -> noteId?.let { EditNoteScreen(it, onNavigateBack = onBack) }
-            Screen.AIChat.route -> AIChatScreen(
-                onCreateNote = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
-                onBack = onBack
-            )
             Screen.Bill.route -> BillScreen(onBack = onBack)
             Screen.BillStats.route -> BillStatsScreen(onBack = onBack)
             Screen.AaSplit.route -> AaSplitScreen(onBack = onBack)
@@ -151,8 +146,7 @@ private fun MainHomeContent(
             if (page == 0) {
                 // 首页 = AI 对话页；输入框内部已为底部悬浮导航栏预留空间
                 AIChatScreen(
-                    onCreateNote = onNavigateToEditNote,
-                    embeddedInHome = true
+                    onCreateNote = onNavigateToEditNote
                 )
             } else {
                 FeatureCenterScreen(

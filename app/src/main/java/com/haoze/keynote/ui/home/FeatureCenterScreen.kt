@@ -137,15 +137,6 @@ fun FeatureCenterScreen(
                 )
             }
 
-            SettingsGroupTitle("AI")
-            SettingsGroup {
-                SettingsNavigationItem(
-                    title = "AI 对话",
-                    subtitle = "整理内容、生成想法和创建笔记",
-                    leadingIcon = painterResource(R.drawable.ic_psychology),
-                    onClick = { onNavigateToRoute(Screen.AIChat.route) }
-                )
-            }
 
             SettingsGroupTitle("系统")
             SettingsGroup {

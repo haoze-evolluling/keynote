@@ -96,7 +96,6 @@ abstract class KeyNotePageActivity : ComponentActivity() {
                 Screen.FeatureHome.route -> MainActivity::class.java
                 Screen.Home.route -> NotesActivity::class.java
                 Screen.EditNote.route -> EditNoteActivity::class.java
-                Screen.AIChat.route -> AiChatActivity::class.java
                 Screen.Bill.route -> BillActivity::class.java
                 Screen.BillStats.route -> BillStatsActivity::class.java
                 Screen.AaSplit.route -> AaSplitActivity::class.java
@@ -125,7 +124,6 @@ abstract class KeyNotePageActivity : ComponentActivity() {
 class MainActivity : KeyNotePageActivity() { override val screen = Screen.FeatureHome }
 class NotesActivity : KeyNotePageActivity() { override val screen = Screen.Home }
 class EditNoteActivity : KeyNotePageActivity() { override val screen = Screen.EditNote }
-class AiChatActivity : KeyNotePageActivity() { override val screen = Screen.AIChat }
 class BillActivity : KeyNotePageActivity() { override val screen = Screen.Bill }
 class BillStatsActivity : KeyNotePageActivity() { override val screen = Screen.BillStats }
 class AaSplitActivity : KeyNotePageActivity() { override val screen = Screen.AaSplit }

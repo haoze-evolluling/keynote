@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.R
 import com.haoze.keynote.data.db.entity.AIChatConversationEntity
-import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.LocalDarkModeManager
@@ -46,21 +45,15 @@ import java.util.Locale
 import kotlin.math.max
 
 /**
- * AI 对话页。
- *
- * @param embeddedInHome 以首页身份嵌入主界面 Pager 时为 true：
- * 隐藏顶栏菜单按钮（已在主界面），并给输入框底部预留悬浮导航栏的空间，
- * 避免底栏遮挡输入框。
+ * AI 对话页（主界面首页）。
+ * 输入框底部预留悬浮导航栏空间，避免底栏遮挡输入框。
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AIChatScreen(
     viewModel: AIChatViewModel = koinViewModel(),
-    onCreateNote: (Long) -> Unit = {},
-    onBack: () -> Unit = {},
-    embeddedInHome: Boolean = false
+    onCreateNote: (Long) -> Unit = {}
 ) {
-    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val darkModeManager = LocalDarkModeManager.current
     val isDarkMode = darkModeManager.isDarkMode()
@@ -167,17 +160,6 @@ fun AIChatScreen(
                         titleContentColor = colors.onSurface,
                         actionIconContentColor = colors.onSurface
                     ),
-                    navigationIcon = {
-                        // 首页嵌入模式已在主界面，无需返回按钮；非嵌入模式显示返回上一级（功能中心）
-                        if (!embeddedInHome) {
-                            IconButton(onClick = onBack) {
-                                Icon(
-                                    painterResource(R.drawable.ic_arrow_back_mirrored),
-                                    contentDescription = "返回"
-                                )
-                            }
-                        }
-                    },
                     actions = {
                         IconButton(onClick = { actionsMenuExpanded = true }) {
                             Icon(painterResource(R.drawable.ic_more_vert), contentDescription = "更多操作")
@@ -265,13 +247,11 @@ fun AIChatScreen(
                     isLoading = isLoading,
                     placeholder = assistantText.inputPlaceholder,
                     colors = colors,
-                    modifier = if (embeddedInHome) {
-                        // 底部预留悬浮导航栏空间：16dp 底距 + 64dp 栏高 + 8dp 间隙
-                        // （ChatInputBar 自身还有 12dp 纵向 padding，合计输入框底部约 88dp）
-                        Modifier.navigationBarsPadding().padding(bottom = 76.dp)
-                    } else {
-                        Modifier.navigationBarsPadding()
-                    },
+                    // 底部预留悬浮导航栏空间：16dp 底距 + 64dp 栏高 + 8dp 间隙
+                    // （ChatInputBar 自身还有 12dp 纵向 padding，合计输入框底部约 88dp）
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .padding(bottom = 76.dp),
                     onInputChange = { inputText = it },
                     onSend = { viewModel.sendMessage(inputText); inputText = "" }
                 )
