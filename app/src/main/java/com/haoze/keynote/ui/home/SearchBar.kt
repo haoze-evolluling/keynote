@@ -14,7 +14,8 @@ import com.haoze.keynote.R
 fun SearchBar(
     query: String,
     onQueryChanged: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    placeholder: String = "搜索笔记或标签..."
 ) {
     OutlinedTextField(
         value = query,
@@ -22,7 +23,7 @@ fun SearchBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = SpacingTokens.screenPadding, vertical = SpacingTokens.smallSpacing),
-        placeholder = { Text("搜索笔记或标签...") },
+        placeholder = { Text(placeholder) },
         leadingIcon = { Icon(painterResource(R.drawable.ic_search), contentDescription = "搜索") },
         trailingIcon = {
             if (query.isNotEmpty()) {
