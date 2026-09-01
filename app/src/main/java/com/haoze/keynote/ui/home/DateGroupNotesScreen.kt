@@ -70,16 +70,18 @@ fun DateGroupNotesScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                // 间隙由 NoteCard 自带 2dp 细线镂空提供，保持全局统一
+                verticalArrangement = Arrangement.spacedBy(0.dp),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
                 groupedNotes.forEach { (month, monthNotes) ->
                     item {
                         Text(
                             text = month,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            color = colors.primary,
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 6.dp)
                         )
                     }
                     items(monthNotes, key = { it.note.id }) { noteWithTags ->
@@ -90,7 +92,6 @@ fun DateGroupNotesScreen(
                             onLongClick = { showActionDialogForNote = noteWithTags.note.id },
                             modifier = Modifier.animateItem()
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
             }

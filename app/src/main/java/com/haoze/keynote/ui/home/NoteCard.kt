@@ -1,12 +1,16 @@
 package com.haoze.keynote.ui.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.haoze.keynote.data.db.entity.NoteWithTags
@@ -29,26 +33,31 @@ fun NoteCard(
     val note = noteWithTags.note
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
 
+    // Bluke 设计语言：独立列表卡片统一 28dp 圆角、surfaceVariant@50%、无阴影，
+    // 卡片间 2dp 细线镂空间隙（上下各 1dp）。
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = SpacingTokens.screenPadding, vertical = SpacingTokens.tinySpacing)
+            .padding(horizontal = SpacingTokens.screenPadding, vertical = 1.dp)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(SpacingTokens.contentSpacing),
-            verticalArrangement = Arrangement.spacedBy(SpacingTokens.contentSpacing)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(SpacingTokens.smallSpacing)
         ) {
             Text(
                 text = note.title.ifBlank { "无标题" },
                 style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = colors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -61,7 +70,11 @@ fun NoteCard(
                     maxLines = 3
                 )
             }
-            Row {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = dateFormat.format(Date(note.createdAt)),
                     style = MaterialTheme.typography.labelSmall,
@@ -69,12 +82,25 @@ fun NoteCard(
                 )
             }
             if (noteWithTags.tags.isNotEmpty()) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     noteWithTags.tags.forEach { tag ->
-                        SuggestionChip(
-                            onClick = { onTagClick(tag.id, tag.name) },
-                            label = { Text("#${tag.name}") }
-                        )
+                        // 6dp 圆角小标签，对齐 Bluke 徽章样式
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                    RoundedCornerShape(SpacingTokens.tagRadius)
+                                )
+                                .clickable { onTagClick(tag.id, tag.name) }
+                                .padding(horizontal = 6.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = "#${tag.name}",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }

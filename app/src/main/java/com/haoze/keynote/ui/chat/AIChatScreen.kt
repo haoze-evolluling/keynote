@@ -36,6 +36,7 @@ import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.LocalDarkModeManager
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.theme.SpacingTokens
 import com.haoze.keynote.ui.common.ActionMenuDialog
 import com.haoze.keynote.ui.common.ActionRow
 import kotlinx.coroutines.delay
@@ -396,8 +397,8 @@ private fun AIChatHistoryRow(
 
     Surface(
         onClick = onOpen,
-        shape = RoundedCornerShape(12.dp),
-        color = colors.surfaceVariant.copy(alpha = 0.3f),
+        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
+        color = colors.surfaceVariant.copy(alpha = 0.5f),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -745,10 +746,9 @@ private fun ChatInputBar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp)),
-        shape = RoundedCornerShape(12.dp),
-        color = colors.surface,
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        shape = RoundedCornerShape(SpacingTokens.statusPillRadius),
+        color = colors.surfaceVariant.copy(alpha = 0.5f),
         shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {

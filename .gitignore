@@ -42,3 +42,5 @@ fastlane/test_output
 lint/
 reports/
 
+# Others
+.workbuddy/

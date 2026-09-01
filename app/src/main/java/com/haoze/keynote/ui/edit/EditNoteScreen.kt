@@ -27,6 +27,7 @@ import com.haoze.keynote.ui.common.ActionRow
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.theme.SpacingTokens
 import com.haoze.keynote.ui.common.ActionMenuDialog
 import android.content.Intent
 import android.content.ClipData
@@ -488,7 +489,7 @@ private fun SummaryCard(
             },
             onLongClick = { showEditDialog = true }
         ),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SpacingTokens.statusPillRadius),
         colors = CardDefaults.cardColors(containerColor = colors.primaryContainer)
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.Top) {

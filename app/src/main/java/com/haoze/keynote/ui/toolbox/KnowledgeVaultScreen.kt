@@ -278,10 +278,11 @@ private fun VaultStatChip(
     accentColor: Color
 ) {
     val colors = LocalAppColors.current
+    // Bluke 风格统计块：无描边、状态块圆角、标准卡片色
     Surface(
-        modifier = Modifier.border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp)),
-        shape = RoundedCornerShape(12.dp),
-        color = colors.surface,
+        modifier = Modifier,
+        shape = RoundedCornerShape(SpacingTokens.statusPillRadius),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {
@@ -435,7 +436,7 @@ private fun FeatureCard(title: String, icon: Painter, content: @Composable Colum
     val colors = LocalAppColors.current
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )

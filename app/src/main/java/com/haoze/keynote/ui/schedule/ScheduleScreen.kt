@@ -32,6 +32,7 @@ import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.theme.SpacingTokens
 import com.haoze.keynote.ui.common.ActionMenuDialog
 import com.haoze.keynote.ui.components.DrawerScaffold
 import androidx.compose.ui.res.painterResource
@@ -114,16 +115,17 @@ fun ScheduleScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(SpacingTokens.cardGap),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
                 groupedSchedules.forEach { (month, monthSchedules) ->
                     item {
                         Text(
                             text = month,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            color = colors.primary,
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp)
                         )
                     }
                     items(monthSchedules, key = { it.id }) { schedule ->
@@ -134,7 +136,7 @@ fun ScheduleScreen(
                                 .padding(horizontal = 16.dp)
                                 .animateItem()
                                 .combinedClickable(onClick = {}, onLongClick = { showActionDialogForSchedule = schedule.id }),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SpacingTokens.listCardRadius),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                             )
@@ -144,7 +146,7 @@ fun ScheduleScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(schedule.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                                    Text(schedule.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                     Spacer(Modifier.height(4.dp))
                                     Text(dateFormat.format(Date(schedule.date)), style = MaterialTheme.typography.bodySmall, color = colors.outline)
                                     if (schedule.location != null) {

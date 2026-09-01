@@ -139,6 +139,20 @@ object SpacingTokens {
     val contentSpacing = 12.dp
     val smallSpacing = 8.dp
     val tinySpacing = 4.dp
+    // ── Bluke 设计语言：卡片式布局 / 细线镂空 / 统一圆角 ──
+    val cardGap = 2.dp                // 分组条目之间的细线镂空间隙
+    val groupedOuterRadius = 28.dp    // 分组首尾条目的外圆角
+    val groupedInnerRadius = 4.dp     // 分组中间条目的内圆角
+    val listCardRadius = 28.dp        // 列表独立卡片圆角（DeviceRow 同款）
+    val cardRadius = 24.dp            // 大内容卡片圆角
+    val pillRadius = 20.dp            // Pill 按钮圆角
+    val statusPillRadius = 12.dp      // 状态 pill / 嵌套小块圆角
+    val tagRadius = 6.dp              // 小标签 / 徽章圆角
+    val iconCircleSize = 40.dp        // 列表条目圆形图标容器
+    val iconCircleInner = 20.dp       // 圆形容器内图标尺寸
+    val itemPaddingHorizontal = 16.dp // 条目水平内边距
+    val itemPaddingVertical = 14.dp   // 条目垂直内边距
+    val sectionSpacing = 16.dp        // 区块之间间距
     val iconSmall = 18.dp
     val iconMedium = 22.dp
     val iconLarge = 24.dp
@@ -192,11 +206,12 @@ fun DialogContent(
 
 // ─── Shapes ───────────────────────────────────────────────────────────────────
 
+// Bluke 圆角体系：徽章 6 → 状态块 12 → 大卡片 24 → 列表卡片/卡片组 28
 private val AppShapes = Shapes(
-    extraSmall = RoundedCornerShape(8.dp),
+    extraSmall = RoundedCornerShape(6.dp),
     small = RoundedCornerShape(12.dp),
     medium = RoundedCornerShape(12.dp),
-    large = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(24.dp),
     extraLarge = RoundedCornerShape(28.dp)
 )
 

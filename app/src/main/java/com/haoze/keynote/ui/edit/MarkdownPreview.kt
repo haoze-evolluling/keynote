@@ -1,6 +1,6 @@
 package com.haoze.keynote.ui.edit
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,13 +21,18 @@ fun MarkdownPreview(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
+    // Bluke 卡片式预览容器：无描边、surfaceVariant@50%、28dp 圆角
+    val containerModifier = modifier
+        .background(
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+            RoundedCornerShape(SpacingTokens.listCardRadius)
+        )
     if (content.isBlank()) {
         Text(
             "暂无内容",
             style = MaterialTheme.typography.bodyLarge,
             color = colors.onSurfaceVariant,
-            modifier = modifier
-                .border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
+            modifier = containerModifier
                 .padding(SpacingTokens.screenPadding)
         )
         return
@@ -36,8 +41,7 @@ fun MarkdownPreview(
     val scrollState = rememberScrollState()
 
     Column(
-        modifier = modifier
-            .border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
+        modifier = containerModifier
             .padding(SpacingTokens.screenPadding)
             .verticalScroll(scrollState)
     ) {

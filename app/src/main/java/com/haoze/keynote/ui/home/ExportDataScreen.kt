@@ -20,6 +20,7 @@ import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.theme.SpacingTokens
 import com.haoze.keynote.util.exporter.NoteExporter
 import com.haoze.keynote.util.exporter.NoteExporter.NoteExportFormat
 import com.haoze.keynote.util.exporter.BillExporter
@@ -319,7 +320,7 @@ private fun AiProviderExportSheet(
             Button(
                 onClick = { onExport(selectedProviderIds) },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(SpacingTokens.pillRadius),
                 enabled = providers.isNotEmpty() && selectedProviderIds.isNotEmpty()
             ) {
                 Text("确认导出")
@@ -345,7 +346,7 @@ private fun ExportSheet(
         ) {
             Text(title, style = ModalTokens.titleTextStyle)
             filterContent()
-            Button(onClick = onConfirm, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) { Text(confirmLabel) }
+            Button(onClick = onConfirm, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(SpacingTokens.pillRadius)) { Text(confirmLabel) }
         }
     }
 }

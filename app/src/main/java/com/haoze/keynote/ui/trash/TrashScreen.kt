@@ -21,6 +21,7 @@ import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.components.SettingsInfoText
 import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
+import com.haoze.keynote.ui.theme.SpacingTokens
 import androidx.compose.ui.res.painterResource
 import com.haoze.keynote.R
 
@@ -58,7 +59,7 @@ fun TrashScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
                     .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(SpacingTokens.cardGap),
                 contentPadding = PaddingValues(vertical = 12.dp)
             ) {
                 item {
@@ -83,7 +84,7 @@ fun TrashScreen(
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                         )

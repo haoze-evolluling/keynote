@@ -20,6 +20,7 @@ import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.LocalAppColors
+import com.haoze.keynote.ui.theme.SpacingTokens
 import androidx.compose.ui.res.painterResource
 import com.haoze.keynote.R
 
@@ -232,13 +233,9 @@ private fun SummaryCard(
 ) {
     val colors = LocalAppColors.current
     Surface(
-        modifier = modifier.border(
-            1.dp,
-            MaterialTheme.colorScheme.outline.copy(alpha = 0.45f),
-            RoundedCornerShape(12.dp)
-        ),
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surface,
+        modifier = modifier,
+        shape = RoundedCornerShape(SpacingTokens.statusPillRadius),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {

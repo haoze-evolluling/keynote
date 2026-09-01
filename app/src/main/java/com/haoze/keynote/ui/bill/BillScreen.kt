@@ -35,6 +35,7 @@ import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.theme.SpacingTokens
 import androidx.compose.ui.res.painterResource
 import com.haoze.keynote.R
 
@@ -77,7 +78,7 @@ fun BillScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(SpacingTokens.cardGap),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
                 items(bills, key = { it.id }) { bill ->
@@ -350,14 +351,14 @@ private fun BillCard(
     Card(
         modifier = Modifier.fillMaxWidth()
             .combinedClickable(onClick = {}, onLongClick = onLongClick),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = bill.item, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                Text(text = bill.item, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 if (!categoryName.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(2.dp))
                     AssistChip(onClick = {}, label = { Text(categoryName, style = MaterialTheme.typography.labelSmall) }, modifier = Modifier.height(24.dp))

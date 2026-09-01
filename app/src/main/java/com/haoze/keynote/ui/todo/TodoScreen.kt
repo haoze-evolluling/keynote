@@ -30,6 +30,7 @@ import com.haoze.keynote.ui.common.ActionRow
 import com.haoze.keynote.ui.common.ActionMenuDialog
 import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.theme.ModalTokens
+import com.haoze.keynote.ui.theme.SpacingTokens
 import com.haoze.keynote.ui.navigation.LocalDrawerScope
 import com.haoze.keynote.ui.navigation.LocalDrawerState
 import com.haoze.keynote.ui.theme.LocalAppColors
@@ -91,7 +92,8 @@ fun TodoScreen(
                     item {
                         Text(
                             text = label,
-                            style = MaterialTheme.typography.titleSmall,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
                             color = colors.primary,
                             modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
                         )
@@ -222,18 +224,18 @@ private fun TodoCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(vertical = 1.dp)
             .combinedClickable(
                 onClick = onToggle,
                 onLongClick = onLongClick
             ),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(

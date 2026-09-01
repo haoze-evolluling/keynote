@@ -195,7 +195,7 @@ private fun HabitEmptyState(
             Spacer(Modifier.height(12.dp))
             TextButton(
                 onClick = onCreate,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(SpacingTokens.pillRadius)
             ) { Text("创建第一个习惯") }
         }
     }
@@ -226,10 +226,11 @@ private fun HabitStatCard(
     modifier: Modifier = Modifier
 ) {
     val colors = LocalAppColors.current
+    // Bluke 风格统计块：无描边、状态块圆角、标准卡片色
     Surface(
-        modifier = modifier.border(1.dp, colors.outline.copy(alpha = 0.45f), RoundedCornerShape(12.dp)),
-        shape = RoundedCornerShape(12.dp),
-        color = colors.surface,
+        modifier = modifier,
+        shape = RoundedCornerShape(SpacingTokens.statusPillRadius),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         shadowElevation = 0.dp,
         tonalElevation = 0.dp
     ) {
@@ -265,7 +266,7 @@ private fun HabitCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onToggle),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SpacingTokens.listCardRadius),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )

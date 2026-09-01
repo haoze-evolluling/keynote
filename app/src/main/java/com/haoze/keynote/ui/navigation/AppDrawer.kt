@@ -277,7 +277,7 @@ private fun DrawerGroupRow(
             .heightIn(min = 44.dp)
             .background(
                 color = backgroundColor,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.extraLarge
             )
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp),
@@ -337,7 +337,7 @@ private fun DrawerNavRow(
             .heightIn(min = 44.dp)
             .background(
                 color = backgroundColor,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.extraLarge
             )
             .clickable(onClick = onClick)
             .padding(start = 36.dp, end = 12.dp),
@@ -393,7 +393,7 @@ private fun DrawerTagsSection(
             .heightIn(min = 44.dp)
             .background(
                 color = backgroundColor,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.extraLarge
             )
             .clickable(onClick = onToggle)
             .padding(start = 36.dp, end = 12.dp),
@@ -441,7 +441,7 @@ private fun DrawerTagsSection(
                             .heightIn(min = 44.dp)
                             .background(
                                 color = colors.transparent,
-                                shape = MaterialTheme.shapes.medium
+                                shape = MaterialTheme.shapes.extraLarge
                             )
                             .clickable { onTagClick(tag) }
                             .padding(start = 68.dp, end = 12.dp),
