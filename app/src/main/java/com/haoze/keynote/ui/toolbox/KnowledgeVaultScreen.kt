@@ -48,24 +48,21 @@ import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.KnowledgeVaultEntity
 import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.SpacingTokens
-import kotlinx.coroutines.launch
 import androidx.compose.ui.res.painterResource
 import com.haoze.keynote.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KnowledgeVaultScreen() {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val viewModel: KnowledgeVaultViewModel = koinViewModel()
 
     DrawerScaffold(
         title = "资料库",
-        onMenuClick = { scope.launch { drawerState.open() } }
+        onMenuClick = { openMainNav?.invoke() }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier

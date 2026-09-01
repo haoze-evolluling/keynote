@@ -26,11 +26,9 @@ import com.haoze.keynote.ui.components.SettingsItem
 import com.haoze.keynote.ui.components.SettingsNavigationItem
 import com.haoze.keynote.ui.components.SettingsRadioItem
 import com.haoze.keynote.ui.components.SettingsScaffold
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.DarkModePreference
 import com.haoze.keynote.viewmodel.SettingsViewModel
-import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -38,8 +36,7 @@ fun SettingsScreen(
     onNavigateToProviderManage: () -> Unit = {},
     viewModel: SettingsViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val providers by viewModel.providers.collectAsState()
     val activeProviderId by viewModel.activeProviderId.collectAsState()
     val noteFontSize by viewModel.noteFontSize.collectAsState()
@@ -49,7 +46,7 @@ fun SettingsScreen(
 
     SettingsScaffold(
         title = "设置",
-        onMenuClick = { scope.launch { drawerState.open() } }
+        onMenuClick = { openMainNav?.invoke() }
     ) { innerPadding ->
         Column(
             modifier = Modifier

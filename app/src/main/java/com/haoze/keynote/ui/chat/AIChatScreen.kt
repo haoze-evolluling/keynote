@@ -30,8 +30,7 @@ import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.R
 import com.haoze.keynote.data.db.entity.AIChatConversationEntity
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.LocalDarkModeManager
@@ -40,7 +39,6 @@ import com.haoze.keynote.ui.theme.SpacingTokens
 import com.haoze.keynote.ui.common.ActionMenuDialog
 import com.haoze.keynote.ui.common.ActionRow
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,8 +50,7 @@ fun AIChatScreen(
     viewModel: AIChatViewModel = koinViewModel(),
     onCreateNote: (Long) -> Unit = {}
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val darkModeManager = LocalDarkModeManager.current
     val isDarkMode = darkModeManager.isDarkMode()
@@ -160,7 +157,7 @@ fun AIChatScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = colors.surface),
                 navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                    IconButton(onClick = { openMainNav?.invoke() }) {
                         Icon(painterResource(R.drawable.ic_menu), contentDescription = "菜单")
                     }
                 },

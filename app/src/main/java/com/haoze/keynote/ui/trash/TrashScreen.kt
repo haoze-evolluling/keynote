@@ -15,9 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.launch
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.components.SettingsInfoText
 import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
@@ -29,8 +27,7 @@ import com.haoze.keynote.R
 fun TrashScreen(
     viewModel: TrashViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val trashItems by viewModel.trashItems.collectAsState()
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
@@ -38,7 +35,7 @@ fun TrashScreen(
 
     SettingsScaffold(
         title = "回收站",
-        onMenuClick = { scope.launch { drawerState.open() } }
+        onMenuClick = { openMainNav?.invoke() }
     ) { innerPadding ->
         if (trashItems.isEmpty()) {
             Box(

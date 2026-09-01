@@ -58,13 +58,11 @@ import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.HabitEntity
 import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.theme.SpacingTokens
 import com.haoze.keynote.util.toDayStartMillis
-import kotlinx.coroutines.launch
 import androidx.compose.ui.res.painterResource
 import com.haoze.keynote.R
 
@@ -81,8 +79,7 @@ private val habitColors = listOf(
 fun HabitScreen(
     viewModel: HabitViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val progressItems by viewModel.progressItems.collectAsState()
     val showEditor by viewModel.showEditor.collectAsState()
@@ -92,7 +89,7 @@ fun HabitScreen(
 
     DrawerScaffold(
         title = "习惯打卡",
-        onMenuClick = { scope.launch { drawerState.open() } },
+        onMenuClick = { openMainNav?.invoke() },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.openCreateEditor() },

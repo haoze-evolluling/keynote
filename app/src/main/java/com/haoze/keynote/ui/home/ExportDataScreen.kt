@@ -16,7 +16,7 @@ import com.haoze.keynote.data.db.NoteDatabase
 import com.haoze.keynote.data.db.entity.CategoryEntity
 import com.haoze.keynote.data.db.entity.TagEntity
 import com.haoze.keynote.data.remote.AiProvider
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
@@ -51,7 +51,7 @@ import com.haoze.keynote.ui.components.SettingsScaffold
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExportDataScreen() {
-    val drawerState = LocalDrawerState.current
+    val openMainNav = LocalOpenMainNav.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -66,7 +66,7 @@ fun ExportDataScreen() {
 
     SettingsScaffold(
         title = "导出数据",
-        onMenuClick = { scope.launch { drawerState.open() } },
+        onMenuClick = { openMainNav?.invoke() },
         snackbarHostState = snackbarHostState
     ) { innerPadding ->
         Column(

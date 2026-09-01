@@ -13,10 +13,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.ui.home.NoteCard
 import com.haoze.keynote.ui.home.NoteActionBottomSheet
 import com.haoze.keynote.viewmodel.HomeViewModel
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.LocalAppColors
-import kotlinx.coroutines.launch
 import android.content.Intent
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -34,8 +32,7 @@ fun TagNotesScreen(
     onNavigateToEdit: (Long?) -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val allNotes by viewModel.notes.collectAsState()
     var showActionDialogForNote by remember { mutableStateOf<Long?>(null) }
@@ -55,7 +52,7 @@ fun TagNotesScreen(
 
     DrawerScaffold(
         title = "#$tagName",
-        onMenuClick = { scope.launch { drawerState.open() } }
+        onMenuClick = { openMainNav?.invoke() }
     ) { innerPadding ->
         if (filteredNotes.isEmpty()) {
             Box(

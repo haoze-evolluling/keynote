@@ -17,14 +17,12 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import com.haoze.keynote.data.db.entity.AaSplitEntity
 import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.theme.SpacingTokens
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -36,8 +34,7 @@ import com.haoze.keynote.R
 fun AaSplitScreen(
     viewModel: AaSplitViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val aaSplits by viewModel.aaSplits.collectAsState()
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
@@ -48,7 +45,7 @@ fun AaSplitScreen(
 
     DrawerScaffold(
         title = "AA计算",
-        onMenuClick = { scope.launch { drawerState.open() } },
+        onMenuClick = { openMainNav?.invoke() },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog = true },

@@ -27,8 +27,7 @@ import com.haoze.keynote.util.toDayStartMillis
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlinx.coroutines.launch
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
@@ -44,8 +43,7 @@ import com.haoze.keynote.R
 fun ScheduleScreen(
     viewModel: ScheduleViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val context = LocalContext.current
     val schedules by viewModel.schedules.collectAsState()
@@ -86,7 +84,7 @@ fun ScheduleScreen(
 
     DrawerScaffold(
         title = "日程",
-        onMenuClick = { scope.launch { drawerState.open() } },
+        onMenuClick = { openMainNav?.invoke() },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog = true },

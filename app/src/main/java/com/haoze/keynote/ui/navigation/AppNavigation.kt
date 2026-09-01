@@ -1,16 +1,18 @@
 package com.haoze.keynote.ui.navigation
 
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.haoze.keynote.ui.bill.AaSplitScreen
@@ -21,6 +23,7 @@ import com.haoze.keynote.ui.edit.EditNoteScreen
 import com.haoze.keynote.ui.habit.HabitScreen
 import com.haoze.keynote.ui.home.DateGroupNotesScreen
 import com.haoze.keynote.ui.home.ExportDataScreen
+import com.haoze.keynote.ui.home.FeatureCenterScreen
 import com.haoze.keynote.ui.home.FeatureHomeScreen
 import com.haoze.keynote.ui.home.HomeScreen
 import com.haoze.keynote.ui.schedule.ScheduleScreen
@@ -54,7 +57,6 @@ sealed class Screen(val route: String, val title: String) {
     data object Schedule : Screen("schedule", "日程")
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppPage(
     route: String,
@@ -64,63 +66,103 @@ fun AppPage(
     onNavigate: (String, Long?, Long?, String?, Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    CompositionLocalProvider(LocalDrawerState provides drawerState, LocalDrawerScope provides scope) {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f),
-            drawerContent = {
-                ModalDrawerSheet(
-                    drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    drawerTonalElevation = 0.dp,
-                    modifier = Modifier.width(260.dp)
-                ) {
-                    AppDrawerContent(
-                        currentRoute = route,
-                        onNavigateToRoute = { target -> onNavigate(target, null, null, null, true) },
-                        onNavigateToTag = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, true) },
-                        onCloseDrawer = { scope.launch { drawerState.close() } }
-                    )
+    // 页面顶栏 menu 按钮：回到主界面（底部导航栏所在的首页）
+    CompositionLocalProvider(
+        LocalOpenMainNav provides { onNavigate(Screen.FeatureHome.route, null, null, null, true) }
+    ) {
+        when (route) {
+            Screen.FeatureHome.route -> MainHomeContent(
+                onNavigateToRoute = { target -> onNavigate(target, null, null, null, true) },
+                onNavigateToTag = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, true) }
+            )
+            Screen.Home.route -> HomeScreen(
+                onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
+                onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
+            )
+            Screen.EditNote.route -> noteId?.let { EditNoteScreen(it, onNavigateBack = onBack) }
+            Screen.AIChat.route -> AIChatScreen { id -> onNavigate(Screen.EditNote.route, id, null, null, false) }
+            Screen.Bill.route -> BillScreen()
+            Screen.BillStats.route -> BillStatsScreen()
+            Screen.AaSplit.route -> AaSplitScreen()
+            Screen.Habit.route -> HabitScreen(viewModel = koinViewModel())
+            Screen.DateGroupNotes.route -> DateGroupNotesScreen(
+                onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
+                onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
+            )
+            Screen.Trash.route -> TrashScreen()
+            Screen.DataExport.route -> ExportDataScreen()
+            Screen.Todo.route -> TodoScreen(viewModel = koinViewModel())
+            Screen.Schedule.route -> ScheduleScreen(viewModel = koinViewModel())
+            Screen.KnowledgeVault.route -> KnowledgeVaultScreen()
+            Screen.Settings.route -> SettingsScreen(
+                onNavigateToProviderManage = {
+                    onNavigate(Screen.AiProviderManage.route, null, null, null, false)
                 }
-            }
-        ) {
-            when (route) {
-                Screen.FeatureHome.route -> FeatureHomeScreen(
-                    onNavigateToRoute = { target -> onNavigate(target, null, null, null, true) }
-                )
-                Screen.Home.route -> HomeScreen(
-                    onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
-                    onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
-                )
-                Screen.EditNote.route -> noteId?.let { EditNoteScreen(it, onNavigateBack = onBack) }
-                Screen.AIChat.route -> AIChatScreen { id -> onNavigate(Screen.EditNote.route, id, null, null, false) }
-                Screen.Bill.route -> BillScreen()
-                Screen.BillStats.route -> BillStatsScreen()
-                Screen.AaSplit.route -> AaSplitScreen()
-                Screen.Habit.route -> HabitScreen(viewModel = koinViewModel())
-                Screen.DateGroupNotes.route -> DateGroupNotesScreen(
-                    onNavigateToEdit = { id -> onNavigate(Screen.EditNote.route, id, null, null, false) },
-                    onNavigateToTagNotes = { id, name -> onNavigate(Screen.TagNotes.route, null, id, name, false) }
-                )
-                Screen.Trash.route -> TrashScreen()
-                Screen.DataExport.route -> ExportDataScreen()
-                Screen.Todo.route -> TodoScreen(viewModel = koinViewModel())
-                Screen.Schedule.route -> ScheduleScreen(viewModel = koinViewModel())
-                Screen.KnowledgeVault.route -> KnowledgeVaultScreen()
-                Screen.Settings.route -> SettingsScreen(
-                    onNavigateToProviderManage = {
-                        onNavigate(Screen.AiProviderManage.route, null, null, null, false)
-                    }
-                )
-                Screen.AiProviderManage.route -> ProviderManagePage(onBack)
-                Screen.TagNotes.route -> if (tagId != null) TagNotesScreen(
-                    tagId = tagId,
-                    tagName = tagName.orEmpty(),
-                    onNavigateToEdit = { id -> id?.let { onNavigate(Screen.EditNote.route, it, null, null, false) } }
+            )
+            Screen.AiProviderManage.route -> ProviderManagePage(onBack)
+            Screen.TagNotes.route -> if (tagId != null) TagNotesScreen(
+                tagId = tagId,
+                tagName = tagName.orEmpty(),
+                onNavigateToEdit = { id -> id?.let { onNavigate(Screen.EditNote.route, it, null, null, false) } }
+            )
+        }
+    }
+}
+
+/**
+ * 主界面：与谛听一致的双页结构（首页 / 功能中心），
+ * HorizontalPager 承载两页，底部悬浮 FloatingNavigationBar 联动切换。
+ */
+@Composable
+private fun MainHomeContent(
+    onNavigateToRoute: (String) -> Unit,
+    onNavigateToTag: (Long, String) -> Unit,
+) {
+    val pagerState = rememberPagerState(initialPage = 0) { 2 }
+    val coroutineScope = rememberCoroutineScope()
+
+    BackHandler(enabled = pagerState.currentPage == 1) {
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(
+                page = 0,
+                animationSpec = tween(durationMillis = 280)
+            )
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            if (page == 0) {
+                FeatureHomeScreen(onNavigateToRoute = onNavigateToRoute)
+            } else {
+                FeatureCenterScreen(
+                    onNavigateToRoute = onNavigateToRoute,
+                    onNavigateToTag = onNavigateToTag
                 )
             }
         }
+
+        FloatingNavigationBar(
+            currentPage = pagerState.currentPage,
+            onPageSelected = { targetPage ->
+                if (pagerState.currentPage != targetPage) {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(
+                            page = targetPage,
+                            animationSpec = tween(durationMillis = 280)
+                        )
+                    }
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 16.dp),
+            pagerProgress = { pagerState.currentPage + pagerState.currentPageOffsetFraction }
+        )
     }
 }
 

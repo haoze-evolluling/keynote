@@ -31,12 +31,10 @@ import com.haoze.keynote.ui.common.ActionMenuDialog
 import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.theme.ModalTokens
 import com.haoze.keynote.ui.theme.SpacingTokens
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.util.toDayStartMillis
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.ui.res.painterResource
@@ -47,8 +45,7 @@ import com.haoze.keynote.R
 fun TodoScreen(
     viewModel: TodoViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val todos by viewModel.todos.collectAsState()
     val categories by viewModel.categories.collectAsState()
@@ -62,7 +59,7 @@ fun TodoScreen(
 
     DrawerScaffold(
         title = "待办事项",
-        onMenuClick = { scope.launch { drawerState.open() } },
+        onMenuClick = { openMainNav?.invoke() },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.openCreateDialog() },

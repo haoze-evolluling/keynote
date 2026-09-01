@@ -26,12 +26,10 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import android.content.ClipData
 import android.content.ClipboardManager
 import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.DialogContent
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.ModalTokens
@@ -44,8 +42,7 @@ import com.haoze.keynote.R
 fun BillScreen(
     viewModel: BillViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val bills by viewModel.bills.collectAsState()
     val billsWithCategory by viewModel.billsWithCategory.collectAsState()
@@ -62,7 +59,7 @@ fun BillScreen(
 
     DrawerScaffold(
         title = "账单",
-        onMenuClick = { scope.launch { drawerState.open() } },
+        onMenuClick = { openMainNav?.invoke() },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog = true },

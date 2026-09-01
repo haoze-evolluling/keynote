@@ -18,8 +18,8 @@ import com.haoze.keynote.ui.common.NoteDeleteConfirmDialog
 import com.haoze.keynote.ui.common.NoteDetailsDialog
 import com.haoze.keynote.ui.common.NoteAddTagDialog
 import com.haoze.keynote.ui.common.NoteManageTagsDialog
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.components.DrawerScaffold
 import com.haoze.keynote.ui.theme.LocalAppColors
 import kotlinx.coroutines.launch
@@ -34,8 +34,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
+    val scope = rememberCoroutineScope()
     val colors = LocalAppColors.current
     val notes by viewModel.notes.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -52,7 +52,7 @@ fun HomeScreen(
 
     DrawerScaffold(
         title = "KeyNote",
-        onMenuClick = { scope.launch { drawerState.open() } },
+        onMenuClick = { openMainNav?.invoke() },
         modifier = modifier,
         floatingActionButton = {
             Box(modifier = Modifier.padding(bottom = 16.dp)) {

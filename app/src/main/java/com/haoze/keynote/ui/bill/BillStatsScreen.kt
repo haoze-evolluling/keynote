@@ -12,13 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import com.haoze.keynote.ui.components.DrawerScaffold
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.LocalAppColors
 import com.haoze.keynote.ui.theme.SpacingTokens
 import androidx.compose.ui.res.painterResource
@@ -29,8 +27,7 @@ import com.haoze.keynote.R
 fun BillStatsScreen(
     viewModel: BillStatsViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val totalSpending by viewModel.totalSpending.collectAsState()
     val billCount by viewModel.billCount.collectAsState()
@@ -49,7 +46,7 @@ fun BillStatsScreen(
 
     DrawerScaffold(
         title = "账单统计",
-        onMenuClick = { scope.launch { drawerState.open() } }
+        onMenuClick = { openMainNav?.invoke() }
     ) { innerPadding ->
         Column(
             modifier = Modifier

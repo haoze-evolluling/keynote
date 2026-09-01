@@ -1,32 +1,55 @@
 package com.haoze.keynote.ui.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.haoze.keynote.R
+import com.haoze.keynote.data.db.KeyNoteDatabase
+import com.haoze.keynote.ui.common.ActionMenuDialog
 import com.haoze.keynote.ui.components.SettingsDivider
 import com.haoze.keynote.ui.components.SettingsGroup
 import com.haoze.keynote.ui.components.SettingsGroupTitle
-import com.haoze.keynote.ui.components.SettingsInfoText
 import com.haoze.keynote.ui.components.SettingsNavigationItem
 import com.haoze.keynote.ui.components.SettingsScaffold
 import com.haoze.keynote.ui.navigation.Screen
 
+/**
+ * 功能中心：承接原侧边栏抽屉的全部导航入口。
+ * 与「首页」组成主界面双页 Pager，通过底部悬浮导航栏切换。
+ */
 @Composable
-fun FeatureHomeScreen(
+fun FeatureCenterScreen(
     onNavigateToRoute: (String) -> Unit,
+    onNavigateToTag: (Long, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    val tags by remember {
+        KeyNoteDatabase.getDatabase(context).tagDao().getActiveTags()
+    }.collectAsState(initial = emptyList())
+    var showTagDialog by remember { mutableStateOf(false) }
 
     SettingsScaffold(
-        title = "首页",
+        title = "功能中心",
         modifier = modifier
     ) { innerPadding ->
         Column(
@@ -35,8 +58,6 @@ fun FeatureHomeScreen(
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
         ) {
-            SettingsInfoText("KeyNote 将笔记、日程、账单和 AI 对话放在同一个工作台中。")
-
             SettingsGroupTitle("笔记")
             SettingsGroup {
                 SettingsNavigationItem(
@@ -51,6 +72,13 @@ fun FeatureHomeScreen(
                     subtitle = "按更新时间回看笔记内容",
                     leadingIcon = painterResource(R.drawable.ic_date_range),
                     onClick = { onNavigateToRoute(Screen.DateGroupNotes.route) }
+                )
+                SettingsDivider()
+                SettingsNavigationItem(
+                    title = "标签分类",
+                    subtitle = "按标签筛选查看笔记",
+                    leadingIcon = painterResource(R.drawable.ic_label_mirrored),
+                    onClick = { showTagDialog = true }
                 )
                 SettingsDivider()
                 SettingsNavigationItem(
@@ -85,7 +113,7 @@ fun FeatureHomeScreen(
                 )
             }
 
-            SettingsGroupTitle("财务")
+            SettingsGroupTitle("记账")
             SettingsGroup {
                 SettingsNavigationItem(
                     title = "记账",
@@ -119,10 +147,69 @@ fun FeatureHomeScreen(
                 )
             }
 
+            SettingsGroupTitle("系统")
+            SettingsGroup {
+                SettingsNavigationItem(
+                    title = "导出数据",
+                    subtitle = "备份笔记、日程和账单数据",
+                    leadingIcon = painterResource(R.drawable.ic_file_download),
+                    onClick = { onNavigateToRoute(Screen.DataExport.route) }
+                )
+                SettingsDivider()
+                SettingsNavigationItem(
+                    title = "回收站",
+                    subtitle = "恢复或彻底删除已移除内容",
+                    leadingIcon = painterResource(R.drawable.ic_delete),
+                    onClick = { onNavigateToRoute(Screen.Trash.route) }
+                )
+                SettingsDivider()
+                SettingsNavigationItem(
+                    title = "设置",
+                    subtitle = "主题、AI 厂商和应用偏好",
+                    leadingIcon = painterResource(R.drawable.ic_settings),
+                    onClick = { onNavigateToRoute(Screen.Settings.route) }
+                )
+            }
+
             // 底部留白，避免最后条目被悬浮导航栏遮挡
             androidx.compose.foundation.layout.Spacer(
                 modifier = Modifier.padding(bottom = 108.dp)
             )
+        }
+    }
+
+    if (showTagDialog) {
+        ActionMenuDialog(
+            title = "标签分类",
+            onDismiss = { showTagDialog = false }
+        ) {
+            if (tags.isEmpty()) {
+                Text(
+                    "暂无标签",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 10.dp)
+                )
+            } else {
+                tags.forEach { tag ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showTagDialog = false
+                                onNavigateToTag(tag.id, tag.name)
+                            }
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "#${tag.name}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
         }
     }
 }

@@ -11,8 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
-import com.haoze.keynote.ui.navigation.LocalDrawerScope
-import com.haoze.keynote.ui.navigation.LocalDrawerState
+import com.haoze.keynote.ui.navigation.LocalOpenMainNav
 import com.haoze.keynote.ui.theme.LocalAppColors
 import android.content.Intent
 import android.content.ClipData
@@ -22,7 +21,6 @@ import com.haoze.keynote.ui.common.NoteDetailsDialog
 import com.haoze.keynote.ui.common.NoteAddTagDialog
 import com.haoze.keynote.ui.common.NoteManageTagsDialog
 import com.haoze.keynote.viewmodel.HomeViewModel
-import kotlinx.coroutines.launch
 import com.haoze.keynote.ui.components.DrawerScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,8 +30,7 @@ fun DateGroupNotesScreen(
     onNavigateToTagNotes: (Long, String) -> Unit,
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val drawerState = LocalDrawerState.current
-    val scope = LocalDrawerScope.current
+    val openMainNav = LocalOpenMainNav.current
     val colors = LocalAppColors.current
     val notes by viewModel.notes.collectAsState()
     var showActionDialogForNote by remember { mutableStateOf<Long?>(null) }
@@ -58,7 +55,7 @@ fun DateGroupNotesScreen(
 
     DrawerScaffold(
         title = "按日期查看",
-        onMenuClick = { scope.launch { drawerState.open() } }
+        onMenuClick = { openMainNav?.invoke() }
     ) { innerPadding ->
         if (notes.isEmpty()) {
             Box(
